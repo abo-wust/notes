@@ -1,0 +1,46 @@
+CTC_CLI(ctc-sdk)# 
+CTC_CLI(ctc-sdk)# show diag pkt-trace detail 
+Show Diag Packet Trace:
+--------------------------------
+Dest Type           :OAM
+Current Position    :IPE
+--------------------------------
+Detail Path Info:
+------------------------------------------------
+
+1st Parsing
+    mac-da                   :0000.0000.0000
+    mac-sa                   :0000.0000.0000
+    ether-type               :0x00000000
+    layer2-ext-type          :0
+    layer3-type              :L3TYPE_NONE
+    layer3-ext-type          :0
+    layer4-type              :L4TYPE_NONE
+    l2-decoder-index         :0
+    l3-decoder-index         :0
+    l4-decoder-index         :0
+
+Interface Mapper
+    source-port              :0x00000000
+    vlan-ptr                 :0
+    bridge-port              :YES
+    route-port               :YES
+
+Decapsulation
+
+Lookup Manager
+    efd-aging-cnt            :0
+    efd-detect-cnt           :0
+    efd-cpu-access-cnt       :0
+    efd-insert-cnt           :0
+    efd-update-cnt           :0
+    efd-hash-conflict-cnt    :0
+
+Destination Processing
+    packet-header            :0x20000093C08A007D80067FFF041000000040000000008800000000000000000000000000000000000000000000000000
+    dest-type                :APS
+    aps-group-1st-level      :3650
+    aps-group-2nd-level      :1604
+    dest-type                :OAM
+
+CTC_CLI(ctc-sdk)# 

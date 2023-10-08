@@ -1,0 +1,51 @@
+1、PC编译平台报错，需要重新安装apt install libssl1.0-dev
+make[2]: Leaving directory '/home/huahuan/work/vpp-pc/platform/HiOS-II/ripd'
+make[1]: Leaving directory '/home/huahuan/work/vpp-pc/platform/HiOS-II/ripd'
+Making install in vtysh
+make[1]: Entering directory '/home/huahuan/work/vpp-pc/platform/HiOS-II/vtysh'
+cd .. && make  am--refresh
+cd .. && make  am--refresh
+  CC     vtysh_main.o
+In file included from sshd/kex.h:33:0,
+                 from sshd/vtysh_sshd.h:8,
+                 from vtysh_main.c:43:
+sshd/cipher.h:68:20: error: field ‘evp’ has incomplete type
+     EVP_CIPHER_CTX evp;
+                    ^~~
+In file included from sshd/vtysh_sshd.h:8:0,
+                 from vtysh_main.c:43:
+sshd/kex.h:106:17: error: field ‘evp_ctx’ has incomplete type
+     HMAC_CTX    evp_ctx;
+                 ^~~~~~~
+Makefile:579: recipe for target 'vtysh_main.o' failed
+make[1]: *** [vtysh_main.o] Error 1
+make[1]: Leaving directory '/home/huahuan/work/vpp-pc/platform/HiOS-II/vtysh'
+Makefile:402: recipe for target 'install-recursive' failed
+make: *** [install-recursive] Error 1
+root@huahuan:/home/huahuan/work/vpp-pc#
+
+
+2、flex-builder -m ls1046ardb报perf错，
+/usr/lib/gcc-cross/aarch64-linux-gnu/7/../../../../aarch64-linux-gnu/bin/ld: cannot find -lz
+collect2: error: ld returned 1 exit status
+Makefile.perf:519: recipe for target '/home/huahuan/work/HT8K13-VPP/driver/flexbuild_lsdk1909/build/linux/linux/arm64/LS/output/LSDK-19.09-V4.19/tools/perf/perf' failed
+make[7]: *** [/home/huahuan/work/HT8K13-VPP/driver/flexbuild_lsdk1909/build/linux/linux/arm64/LS/output/LSDK-19.09-V4.19/tools/perf/perf] Error 1
+Makefile.perf:205: recipe for target 'sub-make' failed
+make[6]: *** [sub-make] Error 2
+Makefile:69: recipe for target 'all' failed
+make[5]: *** [all] Error 2
+Makefile:76: recipe for target 'perf' failed
+make[4]: *** [perf] Error 2
+/home/huahuan/work/HT8K13-VPP/driver/flexbuild_lsdk1909/packages/linux/linux/Makefile:1645: recipe for target 'tools/perf' failed
+make[3]: *** [tools/perf] Error 2
+make[3]: Leaving directory '/home/huahuan/work/HT8K13-VPP/driver/flexbuild_lsdk1909/build/linux/linux/arm64/LS/output/LSDK-19.09-V4.19'
+Makefile:146: recipe for target 'sub-make' failed
+make[2]: *** [sub-make] Error 2
+make[2]: Leaving directory '/home/huahuan/work/HT8K13-VPP/driver/flexbuild_lsdk1909/packages/linux/linux'
+Makefile:117: recipe for target 'perf' failed
+make[1]: *** [perf] Error 2
+make[1]: Leaving directory '/home/huahuan/work/HT8K13-VPP/driver/flexbuild_lsdk1909/packages/linux'
+Makefile:22: recipe for target 'perf' failed
+make: *** [perf] Error 2
+make: Leaving directory '/home/huahuan/work/HT8K13-VPP/driver/flexbuild_lsdk1909'
+

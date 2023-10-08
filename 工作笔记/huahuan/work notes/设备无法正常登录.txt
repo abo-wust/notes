@@ -1,0 +1,10 @@
+
+1、bcm系列在设备不停重启无法正常登录时，在boot下擦除/home/bin目录：
+nand erase.part application
+ubi part application
+ubi create home
+
+
+2、vtss系列在设备无法正常登录，且Telnet无法连接时，在boot下执行下面两条命令可以进入root，然后修改/data/ver下的act_开头的文件名:
+fis load -x linux
+exec -c "serviced_profile=debug ramdisk_size=131072"

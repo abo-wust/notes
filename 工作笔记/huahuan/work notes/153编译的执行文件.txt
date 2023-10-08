@@ -1,0 +1,196 @@
+
+1、拷贝编译得到的可下载文件到本机
+	虚拟机的共享文件夹可以在 “虚拟机设置”->“选项”->"共享文件夹“ 中添加，比如将本机 E:\share 文件夹设置为虚拟机的共享文件夹，在虚拟机中命名为 share-2，保存在 /mnt/hgfs/ 目录下
+	在HT153工程目录下，编译完成后可执行文件分别放在各自文件目录下，按下面例子拷贝到虚拟机的共享文件夹（在本机磁盘中）中
+
+	root@ubuntu:/home/huahuan/work/HT153/platform/zebos/vtysh# cp vtysh /mnt/hgfs/share-2/
+
+	root@ubuntu:/home/huahuan/work/HT153/platform/zebos/ifm# cp ifm /mnt/hgfs/share-2/
+
+	root@ubuntu:/home/huahuan/work/HT153/platform/zebos/devm# cp devm /mnt/hgfs/share-2/
+
+	root@ubuntu:/home/huahuan/work/HT153/project/HT153/product/hal# cp hal /mnt/hgfs/share-2/
+
+	root@ubuntu:/home/huahuan/work/HT153/project/HT153/product/hsl/drv# cp libhsl_drv.so /mnt/hgfs/share-2/
+
+	root@ubuntu:/home/huahuan/work/HT153/project/HT153/product/hsl/mux# cp libhsl_mux.so /mnt/hgfs/share-2/
+
+	root@ubuntu:/home/huahuan/work/HT153/project/HT153/vtssdrv# cp libvtss_api_serval_lite.so /mnt/hgfs/share-2/
+
+
+
+2、下载文件到设备
+
+2.1 启动设备：
+	root 登录，然后切换到/home/bin/目录下，可以看到设备中能运行的一些文件（执行即启动这个进程）
+	(none) login: 
+	(none) login: root
+	login[107]: root login on 'console'
+	-sh: can't access tty; job control turned off
+	# 
+	# 
+	# 
+	# 
+	# ls
+	# cd /home/bin/
+	# ls
+	aaa                             libncurses.so.5
+	devm                            libncurses.so.5.9
+	ftm                             libreadline.so.7
+	hal                             libreadline.so.7.0
+	libcap.so.2                     libvtss_api_serval_lite.so
+	libcap.so.2.25                  libvtss_api_serval_lite.so.xwl
+	libcrypto.so.1.0.0              softlink.sh
+	libhsl_cli.so                   vtss_miniapp_serval_lite
+	libhsl_drv.so                   vtysh
+	libhsl_mux.so                   wjr.sh
+	libncurses.so
+
+2.2 添加路径
+	打开上面的文件列表中的 softlink.sh，添加里面的路径，否则在启动进程时可能出现异常
+	# 
+	#
+	# cat softlink.sh 
+	export LD_LIBRARY_PATH=/home/bin
+
+	ln -fs libcap.so.2.25 libcap.so.2
+	ln -fs libreadline.so.7.0 libreadline.so.7
+	ln -fs libncurses.so.5.9 libncurses.so.5
+	# 
+	# 
+	# export LD_LIBRARY_PATH=/home/bin
+	# 
+
+2.3 修改设备IP
+	# 
+	# 
+	# ifconfig
+	lo        Link encap:Local Loopback  
+			  inet addr:127.0.0.1  Mask:255.0.0.0
+			  inet6 addr: ::1/128 Scope:Host
+			  UP LOOPBACK RUNNING  MTU:65536  Metric:1
+			  RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+			  TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
+			  collisions:0 txqueuelen:1 
+			  RX bytes:0 (0.0 B)  TX bytes:0 (0.0 B)
+
+	vtss.ifh  Link encap:Ethernet  HWaddr 1A:10:BD:AD:1D:70  
+			  UP BROADCAST RUNNING MULTICAST  MTU:10400  Metric:1
+			  RX packets:101 errors:0 dropped:0 overruns:0 frame:0
+			  TX packets:8 errors:0 dropped:1 overruns:0 carrier:0
+			  collisions:0 txqueuelen:1000 
+			  RX bytes:12131 (11.8 KiB)  TX bytes:808 (808.0 B)
+			  Interrupt:23 
+
+	vtss.vlan.1 Link encap:Ethernet  HWaddr 02:00:C1:20:4D:88  
+			  inet addr:192.168.1.1  Bcast:192.168.1.255  Mask:255.255.255.0
+			  inet6 addr: fe80::c1ff:fe20:4d88/64 Scope:Link
+			  UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+			  RX packets:38 errors:0 dropped:0 overruns:0 frame:0
+			  TX packets:8 errors:0 dropped:0 overruns:0 carrier:0
+			  collisions:0 txqueuelen:1 
+			  RX bytes:3674 (3.5 KiB)  TX bytes:936 (936.0 B)
+
+	# 
+	# ifconfig vtss.vlan.1 192.168.10.121
+	# 
+	# 
+	# ifconfig
+	lo        Link encap:Local Loopback  
+			  inet addr:127.0.0.1  Mask:255.0.0.0
+			  inet6 addr: ::1/128 Scope:Host
+			  UP LOOPBACK RUNNING  MTU:65536  Metric:1
+			  RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+			  TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
+			  collisions:0 txqueuelen:1 
+			  RX bytes:0 (0.0 B)  TX bytes:0 (0.0 B)
+
+	vtss.ifh  Link encap:Ethernet  HWaddr 1A:10:BD:AD:1D:70  
+			  UP BROADCAST RUNNING MULTICAST  MTU:10400  Metric:1
+			  RX packets:122 errors:0 dropped:0 overruns:0 frame:0
+			  TX packets:9 errors:0 dropped:1 overruns:0 carrier:0
+			  collisions:0 txqueuelen:1000 
+			  RX bytes:14013 (13.6 KiB)  TX bytes:898 (898.0 B)
+			  Interrupt:23 
+
+	vtss.vlan.1 Link encap:Ethernet  HWaddr 02:00:C1:20:4D:88  
+			  inet addr:192.168.10.121  Bcast:192.168.10.255  Mask:255.255.255.0
+			  inet6 addr: fe80::c1ff:fe20:4d88/64 Scope:Link
+			  UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+			  RX packets:59 errors:0 dropped:0 overruns:0 frame:0
+			  TX packets:9 errors:0 dropped:0 overruns:0 carrier:0
+			  collisions:0 txqueuelen:1 
+			  RX bytes:4800 (4.6 KiB)  TX bytes:1042 (1.0 KiB)
+
+	# 
+	#
+	
+2.4 启动TFTP服务器
+	打开 Tftpd32 服务器，设置路径为 E:\share，或其他路径，只要路径中存放着编译生成的可下载文件即可
+
+2.5 下载文件
+	# 
+	# 
+	# tftp -g 192.168.10.123 -r devm
+	# tftp -g 192.168.10.123 -r hal
+	# tftp -g 192.168.10.123 -r ifm
+	# tftp -g 192.168.10.123 -r libhsl_cli.so
+	# tftp -g 192.168.10.123 -r libhsl_drv.so
+	# tftp -g 192.168.10.123 -r libhsl_mux.so
+	# tftp -g 192.168.10.123 -r libvtss_api_serval_lite.so
+	# tftp -g 192.168.10.123 -r vtysh
+	# 
+	# 
+
+2.6 修改文件权限
+	# 
+	# 
+	# chmod 777 *
+	# 
+	#
+	
+2.7 重启设备
+	重复 2.1 和 2.2 的操作
+	
+2. 启动各个进程
+	先启动devm，然后是hal，再然后是ifm，之后就可以启动vtysh，进入设备config节点了
+	# ./devm &
+	# Connect message queue failed, key:6,id:-1
+	kernel.msgmax = 10000
+	kernel.msgmnb = 10000000
+	Create message queue 1 successful
+	Create message queue 2 successful
+	Create message queue 5 successful
+	Create message queue 9 successful
+	Create message queue 3 successful
+	Create message queue 8 successful
+	Create message queue 101 successful
+	Create message queue 100 successful
+	Create message queue 103 successful
+	Create message queue 102 successful
+	Create message queue 11 successful
+
+	# 
+	# ./hal &
+	# Connect message queue failed, key:6,id:-1
+	Initialize spidrv successfully
+	Initialize i2cdrv successfully
+
+	# ./ifm &
+	#
+	# ./vtysh 
+	Connect message queue failed, key:6,id:-1
+	file /home/cfg/config.init not exist
+
+	Hello, this is Huahuan (version IPRAN V001R001 ).
+
+	User Access Verification
+
+	[  228.465176] sched: RT throttling activated
+	Username: admin
+	Password: 
+	 %User admin log in success!
+
+
+	Hios(config)# 
+	Hios(config)# 

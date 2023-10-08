@@ -1,0 +1,90 @@
+
+NE3≈‰÷√
+
+interface gigabitethernet 1/1/5
+ip address 10.10.103.3
+exit
+
+mpls 
+mpls lsr-id 11.11.11.11
+mpls static-lsp lsp1 ingress destination 7.7.7.7/32 nexthop 10.10.103.10 out-label 310
+mpls static-lsp lsp2 egress destination 11.11.11.11/32 in-label 103
+exit
+
+interface tunnel 1/1/2
+protocol mpls-tp
+source 11.11.11.11 destination 7.7.7.7 
+mpls static-lsp ingress lsp1 egress lsp2
+exit
+
+mpls
+vsi 1
+exit
+pw pw310
+mtu 9600
+label in 101 out 101
+peer 7.7.7.7 vc-id 310
+tunnel bind interface tunnel 1/1/2
+switch vsi 1 spe
+exit
+exit
+
+interface gigabitethernet  1/1/5
+mode l2
+y
+mpls vsi 1
+exit
+
+
+
+
+NE10≈‰÷√
+
+
+interface gigabitethernet 1/1/5
+ip address 10.10.103.10/24
+exit
+
+mpls 
+mpls lsr-id 7.7.7.7
+mpls static-lsp lsp2 ingress destination 11.11.11.11/32 nexthop 10.10.103.3 out-label 103
+mpls static-lsp lsp1 egress destination 7.7.7.7/32 in-label 310
+exit
+
+interface tunnel 1/1/2
+protocol mpls-tp
+source 7.7.7.7 destination 11.11.11.11
+mpls static-lsp ingress lsp2 egress lsp1
+exit
+
+mpls
+vsi 1
+
+exit
+pw pw310
+mtu 9600
+label in 101 out 101
+peer 11.11.11.11 vc-id 310
+tunnel bind interface tunnel 1/1/2
+switch vsi 1 spe
+exit
+exit
+
+device
+device watchdog interval 0
+exit
+
+interface gigabitethernet  1/1/7
+mode l2
+
+y
+mpls vsi 1
+exit
+
+
+
+mac-whitelist 00:00:00:00:11:22
+mac-whitelist 00:00:00:00:11:23
+mac-whitelist 00:00:00:00:11:24
+mac-whitelist 00:00:00:00:11:25
+

@@ -1,0 +1,181 @@
+
+-------------vpls配置---------------
+
+interface tunnel 1/4/111
+protocol gre
+source 112.1.1.2 destination 112.1.1.1
+nexthop 112.1.1.1
+exit
+
+
+mpls
+vsi 1
+exit
+
+
+pw pw1 
+peer 112.1.1.1 vc-id 120
+label in 1122 out 1122
+tunnel policy gre
+switch vsi 1 spe
+exit
+exit
+
+
+mac
+mac static 00:00:00:00:00:11 pw pw1
+exit
+
+
+
+
+-------------删除vpls配置---------------
+
+
+mac 
+no mac static 00:00:00:00:00:11 pw pw1
+exit
+
+mpls
+no vsi 1
+no pw pw1
+exit
+
+
+
+
+
+
+
+
+
+
+
+
+Hios(config)# 
+Hios(config)# 
+Hios(config)# interface tunnel 1/4/111
+<ht201e><2000-01-01 19:28:49><debug><last message repeated 6 times>
+<ht201e><2000-01-01 19:28:49><debug><hal: hal_msg_rcv[95] phdr->msg_type=16  msg_subtype 0 sender_id=1 opcode=1 >
+<ht201e><2000-01-01 19:28:49><debug><hal: hal_ifm_msg[965] ifindex=0x7240006f module_id 1 subtype=0 opcode=1 >
+<ht201e><2000-01-01 19:28:49><debug><hal: hal_ifm_create_hw[652] create type 7 ifindex 0x7240006f do noting >
+<ht201e><2000-01-01 19:28:49><debug><hal: [hal_ifm_event_callback 309] ifm_event_notify pevent ifindex=0x7240006f>
+<ht201e><2000-01-01 19:28:49><debug><hal: [hal_ifm_event_callback 379] event_type=7 interface_type=7 ifindex= 0x7240006f >
+<ht201e><2000-01-01 19:28:49><debug><hal: hal_ifm_create[724]  sucess! >
+<ht201e><2000-01-01 19:28:49><debug><hal: hal_ifm_msg[999]  hal_ifm_create ifindex 0x7240006f ret 0! >
+Hios(config-tunnel1/4/111)#protocol gre
+<ht201e><2000-01-01 19:28:49><debug><hal: hal_msg_rcv[95] phdr->msg_type=38  msg_subtype 0 sender_id=4 opcode=1 >
+<ht201e><2000-01-01 19:28:49><debug><hal: hal_tunnel_msg[1522] opcode = 1, subtype=0>
+<ht201e><2000-01-01 19:28:49><debug><hal: Entering hsl_bcm_tunnel_add >
+<ht201e><2000-01-01 19:28:49><debug><hal: Entering hsl_bcm_tunnel_init_nhi >
+<ht201e><2000-01-01 19:28:49><debug><hal: Entering hsl_bcm_nhlfe_create_egrobj >
+<ht201e><2000-01-01 19:28:49><debug><hal: Returning hsl_bcm_nhlfe_create_egrobj, 74 >
+<ht201e><2000-01-01 19:28:49><debug><hal: Returning hsl_bcm_tunnel_init_nhi, 39 >
+<ht201e><2000-01-01 19:28:49><debug><hal: Entering hsl_bcm_svm_macro_meter_add >
+<ht201e><2000-01-01 19:28:49><debug><hal: Returning hsl_bcm_svm_macro_meter_add, 1906 >
+<ht201e><2000-01-01 19:28:49><debug><hal: Returning hsl_bcm_tunnel_add, 1063 >
+<ht201e><2000-01-01 19:28:49><debug><hal: hal_tunnel_add[102] tunnel protocol=3 >
+Hios(config-tunnel1/4/111)#source 112.1.1.2 destination 112.1.1.1
+Hios(config-tunnel1/4/111)#nexthop 112.1.1.1
+<ht201e><2000-01-01 19:28:50><debug><hal: hal_msg_rcv[95] phdr->msg_type=38  msg_subtype 2 sender_id=4 opcode=3 >
+<ht201e><2000-01-01 19:28:50><debug><hal: hal_tunnel_msg[1557] opcode = 3, subtype=2>
+<ht201e><2000-01-01 19:28:50><debug><hal: hal_ifm_set_link_status[43] ifindex=0x7240006f status=0>
+<ht201e><2000-01-01 19:28:50><debug><hal: hal_ifm_set_status[1154] :  ifindex 0x7240006f up>
+<ht201e><2000-01-01 19:28:50><debug><hal: [hal_ifm_event_callback 309] ifm_event_notify pevent ifindex=0x7240006f>
+<ht201e><2000-01-01 19:28:50><debug><hal: [hal_ifm_event_callback 379] event_type=1 interface_type=7 ifindex= 0x7240006f >
+<ht201e><2000-01-01 19:28:50><debug><hal: [hal_ifm_event_callback 384] event_type=1 ifindex=0x7240006f func 0x59e31f >
+<ht201e><2000-01-01 19:28:50><debug><hal: Entering hsl_bcm_ifm_led_set >
+<ht201e><2000-01-01 19:28:50><debug><hal: Returning hsl_bcm_ifm_led_set, 15327 >
+<ht201e><2000-01-01 19:28:50><debug><hal: hal_ifm_set_status[1190] : ipc_send_common1 ifindex 0x7240006f up>
+<ht201e><2000-01-01 19:28:50><debug><hal: hal_ifm_set_sons_status[1134] ifm_event_notify ifindex 0x7240006f pifm->sonlist is null >
+<ht201e><2000-01-01 19:28:50><debug><hal: hal_ifm_set_status[1200] :  ifindex 0x7240006f up>
+<ht201e><2000-01-01 19:28:50><debug><hal: Entering hsl_bcm_nhlfe_add >
+<ht201e><2000-01-01 19:28:50><debug><hal: Entering hsl_bcm_nhlfe_add_public >
+<ht201e><2000-01-01 19:28:50><debug><hal: Entering hsl_bcm_nhlfe_set_intf_info >
+<ht201e><2000-01-01 19:28:50><debug><hal: Entering hsl_bcm_nhlfe_add_intf >
+<ht201e><2000-01-01 19:28:50><debug><hal: Entering hsl_bcm_nhlfe_init_intf >
+<ht201e><2000-01-01 19:28:50><debug><hal: Returning hsl_bcm_nhlfe_init_intf, 14 >
+<ht201e><2000-01-01 19:28:50><debug><hal: hsl_bcm_nhlfe_add_intf[670] intf_id=0 >
+<ht201e><2000-01-01 19:28:50><debug><hal: hsl_bcm_nhlfe_add_intf[671] vid=0, inner_vid=0 >
+<ht201e><2000-01-01 19:28:50><debug><hal: hsl_bcm_nhlfe_add_intf[672] mac: 0:0:0:0:0:1 >
+<ht201e><2000-01-01 19:28:50><debug><hal: Entering hsl_bcm_nhlfe_create_intf >
+<ht201e><2000-01-01 19:28:50><debug><hal: Returning hsl_bcm_nhlfe_create_intf, 33 >
+<ht201e><2000-01-01 19:28:50><debug><hal: hsl_bcm_nhlfe_add_intf[682] intf_id=12 >
+<ht201e><2000-01-01 19:28:50><debug><hal: Returning hsl_bcm_nhlfe_add_intf, 684 >
+<ht201e><2000-01-01 19:28:50><debug><hal: Entering hsl_bcm_nhlfe_init_egress_label >
+<ht201e><2000-01-01 19:28:50><debug><hal: Returning hsl_bcm_nhlfe_init_egress_label, 100 >
+<ht201e><2000-01-01 19:28:50><debug><hal: hsl_bcm_nhlfe_add_public[943] intf=12, label=1015812 >
+<ht201e><2000-01-01 19:28:50><debug><hal: hsl_bcm_nhlfe_add_public[945] ttl=255, flags=21 >
+<ht201e><2000-01-01 19:28:50><debug><hal: Entering hsl_bcm_nhlfe_set_tunnel_initiator >
+<ht201e><2000-01-01 19:28:50><debug><hal: hsl_bcm_nhlfe_set_tunnel_initiator[123] unit=0, intf=12, label=1015812, ttl=255, flags=33>
+<ht201e><2000-01-01 19:28:50><debug><hal: Returning hsl_bcm_nhlfe_set_tunnel_initiator, 130 >
+<ht201e><2000-01-01 19:28:50><debug><hal: Entering hsl_bcm_nhlfe_set_egr_info >
+<ht201e><2000-01-01 19:28:50><debug><hal: Entering hsl_bcm_tunnel_get_master_nhi >
+<ht201e><2000-01-01 19:28:50><debug><hal: Returning hsl_bcm_tunnel_get_master_nhi, 1130 >
+<ht201e><2000-01-01 19:28:50><debug><hal: hsl_bcm_nhlfe_set_egr_info[791] egr_l3_id=100002, label_type=5, drop=1,port = 0, intf = 12 >
+<ht201e><2000-01-01 19:28:50><debug><hal: hsl_bcm_nhlfe_set_egr_info[793] phb_enable=0, qos_map_id=0, queue_id =0,queue_map_id = 0 >
+<ht201e><2000-01-01 19:28:50><debug><hal: Returning hsl_bcm_nhlfe_set_egr_info, 795 >
+<ht201e><2000-01-01 19:28:50><debug><hal: Entering hsl_bcm_nhlfe_add_egrobj >
+<ht201e><2000-01-01 19:28:50><debug><hal: Entering hsl_bcm_nhlfe_init_egress >
+<ht201e><2000-01-01 19:28:50><debug><hal: Returning hsl_bcm_nhlfe_init_egress, 57 >
+<ht201e><2000-01-01 19:28:50><debug><hal: hsl_bcm_nhlfe_add_egrobj[887] port=0, intf=12, flags=140,label=-1 >
+<ht201e><2000-01-01 19:28:50><debug><hal: hsl_bcm_nhlfe_add_egrobj[888] 0:0:0:0:0:2>
+<ht201e><2000-01-01 19:28:50><debug><hal: hsl_bcm_nhlfe_add_egrobj[890] label=-1, flags=101000,exp=0>
+<ht201e><2000-01-01 19:28:50><debug><hal: hsl_bcm_nhlfe_add_egrobj[891] failover_id=0, failover_if_id=0>
+<ht201e><2000-01-01 19:28:50><debug><hal: Entering hsl_bcm_nhlfe_create_egrobj >
+<ht201e><2000-01-01 19:28:50><debug><hal: Returning hsl_bcm_nhlfe_create_egrobj, 74 >
+<ht201e><2000-01-01 19:28:50><debug><hal: hsl_bcm_nhlfe_add_egrobj[899] create egrobj_id = 100002>
+<ht201e><2000-01-01 19:28:50><debug><hal: Returning hsl_bcm_nhlfe_add_egrobj, 901 >
+<ht201e><2000-01-01 19:28:50><debug><hal: Returning hsl_bcm_nhlfe_add_public, 989 >
+<ht201e><2000-01-01 19:28:50><debug><hal: Returning hsl_bcm_nhlfe_add, 203 >
+<ht201e><2000-01-01 19:28:50><debug><hal: Entering hsl_bcm_gre_add >
+<ht201e><2000-01-01 19:28:50><debug><hal: Entering hsl_bcm_gre_add_terminate >
+<ht201e><2000-01-01 19:28:50><debug><hal: Returning hsl_bcm_gre_add_terminate, 344 >
+<ht201e><2000-01-01 19:28:50><debug><hal: hsl_bcm_fpga_get_bank_addr[962] way = 1, slothw=0, slot=0, slot_id = 0 >
+<ht201e><2000-01-01 19:28:50><debug><hal: hsl_bcm_fpga_get_bank_addr[963] : bank_addr = 0, base_index = 16384 >
+<ht201e><2000-01-01 19:28:50><debug><hal: Returning hsl_bcm_fpga_add_gre_cfg, 1081 >
+<ht201e><2000-01-01 19:28:50><debug><hal: Returning hsl_bcm_gre_add, 52 >
+<ht201e><2000-01-01 19:28:50><debug><hal: hal_msg_rcv[95] phdr->msg_type=37  msg_subtype 9 sender_id=37 opcode=4 >
+Hios(config-tunnel1/4/111)#exit
+Hios(config)# 
+Hios(config)# 
+Hios(config)# mpls
+Hios(config-mpls)# vsi 1
+Hios(mpls-vsi-1)# exit
+Hios(config-mpls)# 
+Hios(config-mpls)# 
+Hios(config-mpls)# pw pw1 
+Hios(mpls-pw-pw1)# peer 112.1.1.1 vc-id 120
+Error: PW has been binding and cannot be modified !
+Hios(mpls-pw-pw1)# label in 1122 out 1122
+Error: PW has been binding and cannot be modified !
+Hios(mpls-pw-pw1)# tunnel policy gre
+Error: PW has been binding and cannot be modified !
+Hios(mpls-pw-pw1)# switch vsi 1 spe
+ERROR: The PW 'pw1' has been binding !
+Hios(mpls-pw-pw1)# exit
+Hios(config-mpls)# exit
+Hios(config)# 
+Hios(config)# 
+Hios(config)# 
+Hios(config)# 
+Hios(config)# 
+Hios(config)# 
+Hios(config)# mac
+Hios(config-mac)# mac static 00:00:00:00:00:11 pw pw1
+<ht201e><2000-01-01 19:29:05><debug><last message repeated 2 times>
+<ht201e><2000-01-01 19:29:05><debug><hal: hal_msg_rcv[95] phdr->msg_type=5  msg_subtype 16 sender_id=4 opcode=1 >
+<ht201e><2000-01-01 19:29:05><debug><hal: hal_vsi_msg[1736]:opcode=1, subtype=16.>
+<ht201e><2000-01-01 19:29:05><debug><hal: hal_vsi_msg[1737]: pwindex =1>
+<ht201e><2000-01-01 19:29:05><debug><hal: Entering hsl_bcm_mac_static_vsi_add >
+<ht201e><2000-01-01 19:29:05><debug><hal: Entering hsl_bcm_pw_l2vpn_get_id >
+<ht201e><2000-01-01 19:29:05><debug><hal: Returning hsl_bcm_pw_l2vpn_get_id, 302 >
+<ht201e><2000-01-01 19:29:05><debug><hal: Entering hsl_bcm_pw_get_mplsport >
+<ht201e><2000-01-01 19:29:05><debug><hal: Returning hsl_bcm_pw_get_mplsport, 4035 >
+<ht201e><2000-01-01 19:29:05><debug><hal: hsl_bcm_mac_static_vsi_add[216] vid = 7000, mport = 18000001 >
+<ht201e><2000-01-01 19:29:05><debug><hal: Returning hsl_bcm_mac_static_vsi_add, 233 >
+Hios(config-mac)# exit
+Hios(config)# 
+Hios(config)# 
+Hios(config)# 
+

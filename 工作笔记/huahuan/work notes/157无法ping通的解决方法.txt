@@ -1,0 +1,101 @@
+157设备ping不通的解决方法：
+
+通过另一台设备转发，电脑直连201设备端口1/1/5，另一端口1/1/8直连157设备端口1/1/5。
+
+1、在201设备上创建vlan 1。
+
+2、电脑直连201设备端口 1/1/5，配置 1/1/5 模式，加入vlan 1中：
+	Hios(config)# 
+	Hios(config)# interface gigabitethernet 1/1/5
+	Hios(config-gigabitethernet1/1/5)#
+	Hios(config-gigabitethernet1/1/5)#mode switch 
+	%Configuration based on original mode will be cleared,change the mode?(Y/N)
+	%Change the mode to switch success!
+	Hios(config-gigabitethernet1/1/5)#switch hybrid 
+	Hios(config-gigabitethernet1/1/5)#switch access-vlan 1
+	Hios(config-gigabitethernet1/1/5)#exit
+	Hios(config)# 
+
+3、配置201设备端口 1/1/8，加入vlan 1中：
+	Hios(config)#
+	Hios(config)# interface gigabitethernet 1/1/8
+	Hios(config-gigabitethernet1/1/8)#mode switch 
+	%Configuration based on original mode will be cleared,change the mode?(Y/N)
+	%Change the mode to switch success!
+	Hios(config-gigabitethernet1/1/8)#switch trunk 
+	Hios(config-gigabitethernet1/1/8)#switch vlan 1
+	Hios(config-gigabitethernet1/1/8)#exit
+	Hios(config)# 
+	
+4、在157设备上创建vlan 1，配置接口 1/1/5：
+	Hios(config)# 
+	Hios(config)# interface gigabitethernet 1/1/5
+	Hios(config-gigabitethernet1/1/5)#mode switch 
+	%Configuration based on original mode will be cleared,change the mode?(Y/N)
+	%Change the mode to switch success!
+	Hios(config-gigabitethernet1/1/5)#switch trunk 
+	Hios(config-gigabitethernet1/1/5)#switch vlan 1
+	Hios(config-gigabitethernet1/1/5)#
+	Hios(config-gigabitethernet1/1/5)#exit
+	Hios(config)#
+	
+5、在157设备上创建接口 vlanif，并配置 IP：
+	Hios(config)# interface vlanif 1
+	Hios(config-vlanif1)#
+	Hios(config-vlanif1)#ip address 192.168.1.112/24
+	Hios(config-vlanif1)#
+	Hios(config-vlanif1)#exit
+	Hios(config)# 
+
+6、在157设备上配置电脑的 arp：
+	Hios(config)# 
+	Hios(config)# arp                     
+	Hios(config-arp)#
+	Hios(config-arp)#arp static ip 192.168.1.123 mac  08:57:00:F1:F3:0A  interface vlanif 1 port gigabitethernet 1/1/5
+	Hios(config-arp)#exit
+	Hios(config)#
+	Hios(config)# 
+	Hios(config)# show arp
+	IP ADDRESS      MAC ADDRESS        INTERFACE                    VPN  STATUS  
+	192.168.1.123   08:57:00:F1:F3:0A  vlanif 1                     0    STATIC  
+	TOTAL NUM:1     DYNAMIC NUM:0        STATIC NUM:1 
+	Hios(config)# 
+	Hios(config)# 
+
+7、在电脑端配置157 设备的 arp：
+	以管理员模式打开 cmd 窗口，输入 netsh i i show in，查看电脑网卡
+	C:\Windows\system32>
+	C:\Windows\system32>netsh i i show in
+
+	Idx     Met         MTU          状态                名称
+	---  ----------  ----------  ------------  ---------------------------
+	  1          50  4294967295  connected     Loopback Pseudo-Interface 1
+	 11          20        1500  connected     本地连接
+	 14          20        1500  connected     VMware Network Adapter VMnet1
+	 16          20        1500  connected     VMware Network Adapter VMnet8
+	 19          10        1500  connected     本地连接 2
+
+
+	C:\Windows\system32>
+	
+	使用 “本地连接 2” 直连的 201 设备，所以需要在 Idx 19 下添加一条arp，用来解析 157 设备，
+	C:\Windows\system32>
+	C:\Windows\system32>netsh -C "i i" add ne 19 192.168.1.112 00-01-02-03-04-06 store=active
+	C:\Windows\system32>
+	C:\Windows\system32>
+	C:\Windows\system32>arp -a
+
+		接口: 192.168.1.123 --- 0x13
+		  Internet 地址         物理地址              类型
+		  192.168.1.112         00-01-02-03-04-06     静态
+		  192.168.1.255         ff-ff-ff-ff-ff-ff     静态
+		  224.0.0.5             01-00-5e-00-00-05     静态
+		  224.0.0.22            01-00-5e-00-00-16     静态
+		  224.0.0.251           01-00-5e-00-00-fb     静态
+		  224.0.0.252           01-00-5e-00-00-fc     静态
+		  239.255.255.250       01-00-5e-7f-ff-fa     静态
+
+	C:\Windows\system32>
+	C:\Windows\system32>
+
+	这里使用命令 arp -a 查看电脑网卡的 arp 表项，截取“本地连接 2”的部分，可以看到 157 设备的 IP 和 mac 添加成功，然后就可以 ping 通157设备。

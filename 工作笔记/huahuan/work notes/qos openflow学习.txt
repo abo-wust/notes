@@ -1,0 +1,37 @@
+1、QoS 技术包括流分类、流量监管、流量整形、接口限速、拥塞管理、拥塞避免等。
+	流分类：采用一定的规则识别符合某类特征的报文，它是对网络业务进行区分服务的前提和基础。
+	流量监管：对进入或流出设备的特定流量进行监管。当流量超出设定值时，可以采取限制或惩罚措施，以保护网络资源不受损害。可以作用在接口入方向和出方向。
+	流量整形：一种主动调整流的输出速率的流量控制措施，用来使流量适配下游设备可供给的网络资源，避免不必要的报文丢弃，通常作用在接口出方向。
+	拥塞管理：就是当拥塞发生时如何制定一个资源的调度策略，以决定报文转发的处理次序，通常作用在接口出方向。
+	拥塞避免：监督网络资源的使用情况，当发现拥塞有加剧的趋势时采取主动丢弃报文的策略，通过调整队列长度来解除网络的过载，通常作用在接口出方向。
+
+
+2、配置方式
+	QoS 的配置方式分为QoS 策略配置方式和非QoS 策略配置方式两种。非 QoS 策略配置方式是指不通过 QoS 策略来进行配置。例如，端口限速功能可以通过直接在接口上配置实现。
+	QoS 策略包含了三个要素：类、流行为、策略。用户可以通过QoS 策略将指定的类和流行为绑定起来，灵活地进行QoS 配置。
+(1) 类
+	类的要素包括：类的名称和类的规则。
+	用户可以通过命令定义一系列的规则来对报文进行分类。同时用户可以指定规则之间的关系：and 或者or。
+	and：报文只有匹配了所有的规则，设备才认为报文属于这个类。
+	or：报文只要匹配了类中的任何一个规则，设备就认为报文属于这个类。
+(2) 流行为
+	流行为用来定义针对报文所做的 QoS 动作。
+	流行为的要素包括：流行为的名称和流行为中定义的动作。
+	用户可以通过命令在一个流行为中定义多个动作。
+(3) 策略
+	策略用来将指定的类和流行为绑定起来，对分类后的报文执行流行为中定义的动作。
+	策略的要素包括：策略名称、绑定在一起的类和流行为的名称。
+	用户可以在一个策略中定义多个类与流行为的绑定关系。
+
+3、openflow
+	The OpenFlow pipeline processing defines how packets interact with those flow tables.
+	An OpenFlow switch is required to have at least one ingress flow table, and can optionally have more flow tables.
+	Pipeline processing always starts with ingress processing at the first flow table.
+	Other ingress flow tables may be used depending on the outcome of the match in the first table.
+	Egress processing is optional, a switch may not support any egress tables or may not be configured to use them.
+	
+	If both an output action and a group action are specified in an action set, the output action is ignored and the group action takes precedence.
+	
+
+
+

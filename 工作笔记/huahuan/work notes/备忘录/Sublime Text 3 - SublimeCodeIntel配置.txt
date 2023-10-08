@@ -1,0 +1,37 @@
+1、在package control 中安装完SublimeCodeIntel
+
+2、通过Preference >> Browse Packages >>  SublimeCodeIntel，在当前路径下新建文件夹“.codeintel”，然后在 .codeintel 文件夹下新建文件“config.log”,在文件中写入下面的配置。里面的路径是 Python 的安装路径，可以在 python IDLE 中通过 sys.path 获取。
+
+
+"Python3": {
+            "python": "C:\\Users\\liubo.BJHUAHUAN\\AppData\\Local\\Programs\\Python\\Python36\\python.exe",
+            "codeintel_scan_extra_dir": [
+                "C:\\Users\\liubo.BJHUAHUAN\\AppData\\Local\\Programs\\Python\\Python36\\DLLs",
+                "C:\\Users\\liubo.BJHUAHUAN\\AppData\\Local\\Programs\\Python\\Python36\\Lib",
+                "C:\\Users\\liubo.BJHUAHUAN\\AppData\\Local\\Programs\\Python\\Python36\\Lib\\site-packages",
+                "C:\\Users\\liubo.BJHUAHUAN\\AppData\\Local\\Programs\\Python\\Python36\\Lib\\idlelib",
+                "C:\\Users\\liubo.BJHUAHUAN\\AppData\\Local\\Programs\\Python\\Python36",
+                "C:\\Users\\liubo.BJHUAHUAN\\AppData\\Local\\Programs\\Python\\Python36\\Lib\\*",
+            ]
+
+        }
+
+3、进入 Preference >> Package Settings >> SublimeCodeIntel >> Mouse Bindings - User，输入下面配置，就能实现Ctrl+鼠标左键跳转到函数定义
+
+[
+	//ctrl + 鼠标左键进入函数定义
+	{
+		"button": "button1",
+		"count": 1,
+		"modifiers": ["ctrl"],
+		"press_command": "drag_select",
+		"command": "goto_definition"
+	},
+	//ctrl + 鼠标右键返回前一个函数
+	{
+		"button": "button2",
+		"count": 1,
+		"modifiers": ["ctrl"],
+		"command": "jump_back"
+	}
+]

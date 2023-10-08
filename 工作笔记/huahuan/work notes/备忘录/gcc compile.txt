@@ -1,0 +1,62 @@
+#include <stdio.h>
+
+int sum(int m)
+{
+    int i,n = 0;
+    for(i = 1; i <= m; i++)
+    {
+        n += i;
+    }
+    printf("After the function of sum, the sum of 1-%d is %d \n", m, n);
+    return n;
+}
+
+int main()
+{
+    int i,n = 0;
+    sum(50);
+    for(i = 1; i <= 50; i++)
+    {
+        n += i;
+    }
+  
+    printf("The sum of 1-50 is %d \n", n);
+    return 0;
+}
+
+1、预处理阶段
+	gcc -E hello.c -o hello.i
+	在源文件中插入头文件 stdio.h 的详细代码，生成 hello.i 文件，查看 hello.i 的内容可以看到。
+	
+2、编译阶段
+	gcc -S hello.i -o hello.s
+	检查源代码的规范性、是否有语法错误等。检查无误后，生成汇编代码文件 hello.s 。
+	
+3、汇编阶段
+	gcc -c hello.s -o hello.o
+	将编译生成的汇编文件 hello.s 翻译成机器语言，生成二进制的目标代码，即 hello.o 文件。使用命令 hexdump hello.o 可以查看。
+	
+4、链接阶段
+	gcc hello.o -o hello
+	将代码中所使用的到的库函数（如：printf、memcpy等）链接到正确的库文件，然后生成可执行文件 hello 。具体链接使用动态库，还是静态库这里不表。
+	
+	
+注：
+	gcc [] test.c -o warning
+	显示编译过程中的告警信息,[]中的操作选项可以是 -ansi、-pedantic、-Wall等，常用选项 -Wall 显示 gcc 提供的所有有用的告警信息，其他选项各有不同含义。
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	

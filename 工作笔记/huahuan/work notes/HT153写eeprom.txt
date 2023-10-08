@@ -1,0 +1,12 @@
+
+# ./eeptools 153 box back modify
+
+product information modify:
+hwcfg                    : [] -> 0xfe040600
+device                   : [] -> ht153
+oemname                  : [] ->
+1st_mac                  : [] -> 00:01:02:03:04:05
+macnum                   : [] -> 1
+hardware_version         : [] -> a01-a100
+vendor                   : [] -> huahuan
+sn                       : [] -> 1234

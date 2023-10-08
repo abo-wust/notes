@@ -1,0 +1,27 @@
+
+1、添加mac并查看
+	hw-rw 0 command MAC/Add/00-01-02-03-04-05/1/100
+	hw-rw 0 command DEBUG/Api/mac_table            
+
+2、查看进程状态
+	在 config 节点下执行 sysrun，登录的密码为 hios@123，进入 sysrun 节点后Telnet到 127.1
+
+	Hios(config)# sysrun 
+
+	Insert password: 
+	Hios(sysrun)# 
+	Hios(sysrun)# 
+	Hios(sysrun)# telnet 127.1
+
+	Entering character mode
+	Escape character is '^]'.
+
+
+	(none) login: root
+	login[454]: root login on 'pts/0'
+	#
+	#
+	
+	然后输入 ps 即可查看
+
+3、

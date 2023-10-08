@@ -1,0 +1,20 @@
+1、下载 platform 代码到虚拟机目录 /home/huahuan/work/sptn/ 
+	svn路径：svn://172.16.95.118/work/platform/HiOS_SPTN
+
+2、修改package.cfg 里面定义的内核路径
+	/home/huahuan/work/sptn/HiOS_SPTN/OF-DPA/output/iproc-saber2-xldk/package.cfg
+
+	export DELIVERABLES_DIR=$(shell pwd)/../../my-target/ht201
+	export KERNEL_SRC=/home/zhangqi/anzhipeng/netconf/kernel/linux-3.6.5
+	export KERNDIR=   /home/zhangqi/anzhipeng/netconf/kernel/linux-3.6.5
+	export KERNEL_DIR=/home/zhangqi/anzhipeng/netconf/kernel/linux-3.6.5
+
+	修改为201的kernel存放路径：/home/huahuan/work/sptn/kernel/HT201/kernel/linux-3.6.5
+3、编译
+	在 HiOS_SPTN/ 下执行编译脚本 build-sh
+	在路径 HiOS_SPTN/OF-DPA/output/iproc-saber2-xldk/ 下 make 
+
+
+4、电脑端软件
+	解压 mgNetConfBrowser-2017b.rar 进入解压后文件夹，安装（setup.exe）。
+	购买的软件版权原因，启动软件之前需要修改电脑时间到2017年6月中旬，然后启动后按提示输入 license.key 。

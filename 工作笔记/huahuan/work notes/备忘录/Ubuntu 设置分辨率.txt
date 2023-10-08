@@ -1,0 +1,20 @@
+1、显示分辨率为1600x900需要的信息
+cvt 1600 900 
+
+2、添加一个新的分辨率1600x900
+xrandr --newmode "1600x900_60.00"  118.25  1600 1696 1856 2112  900 903 908 934 -hsync +vsync
+
+3、将1600x900添加到xrandr命令显示的内容里（这里Virtual1是设备名）
+xrandr --addmode Virtual1 "1600x900_60.00"
+
+4、修改分辨率为1600x900
+xrandr --output Virtual1 --mode "1600x900_60.00"
+
+5、保存配置到~./profile，避免重启后消失
+gedit ~/.profile
+
+6、文件最后添加命令
+cvt 1600 900 
+xrandr --newmode "1600x900_60.00"  118.25  1600 1696 1856 2112  900 903 908 934 -hsync +vsync
+xrandr --addmode Virtual1 "1600x900_60.00"
+xrandr --output Virtual1 --mode "1600x900_60.00"

@@ -1,0 +1,64 @@
+﻿
+mpls
+mpls lsr-id 1.1.1.1
+mpls static-lsp lsp1 ingress destination 3.3.3.3/32 outif gigabitethernet 1/6/1 dmac 64:1e:81:01:02:09 out-label 1000
+mpls static-lsp lsp2 egress destination 1.1.1.1/32 in-label 1000 
+exit
+
+interface tunnel 1/5/1
+protocol mpls-tp
+source 1.1.1.1 destination 3.3.3.3
+mpls static-lsp ingress lsp1 egress lsp2
+exit
+
+mpls
+pw pw1
+vc-type tdm
+peer 3.3.3.3 vc-id 100
+label in 100 out 100 
+tunnel bind interface tunnel 1/5/1
+exit
+exit
+
+interface tdm 1/8/1
+mode unframed
+mpls l2vpn pw pw1
+exit
+
+
+
+
+
+//-------------------------------------201E
+debug hal enable
+
+
+mpls
+mpls lsr-id 3.3.3.3
+mpls static-lsp lsp1 ingress destination 1.1.1.1/32 outif gigabitethernet 1/6/1 dmac 00:eb:00:00:00:16 out-label 1000
+mpls static-lsp lsp2 egress destination 3.3.3.3/32 in-label 1000
+exit
+
+interface tunnel 1/5/1
+protocol mpls-tp
+source 3.3.3.3 destination 1.1.1.1
+mpls static-lsp ingress lsp1 egress lsp2
+exit
+
+mpls
+pw pw1
+vc-type tdm
+peer 1.1.1.1 vc-id 100
+label in 100 out 100 
+tunnel bind interface tunnel 1/5/1
+exit
+exit
+
+interface tdm 1/7/1
+mode unframed
+mpls l2vpn pw pw1
+exit
+
+
+
+

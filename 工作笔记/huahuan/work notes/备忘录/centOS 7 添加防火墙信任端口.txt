@@ -1,0 +1,20 @@
+在centOS 7虚拟机上安装完Nginx后，启动Nginx服务，在虚拟机外部无法访问Nginx服务端口（默认工作在80端口）
+
+原因是centOS 7的防火墙设置使得无法访问，将Nginx工作的端口添加到防火墙的信任端口里就可以正常访问。
+
+firewall-cmd --zone=public --add-port=80/tcp --permanent
+
+命令含义：
+
+–zone #作用域
+
+–add-port=80/tcp #添加端口，格式为：端口/通讯协议
+
+–permanent #永久生效，没有此参数重启后失效
+
+重启防火墙：
+
+systemctl stop firewalld.service  
+systemctl start firewalld.service  
+
+再次刷新访问就可以了

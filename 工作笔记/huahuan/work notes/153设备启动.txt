@@ -1,0 +1,109 @@
+(none) login: 
+(none) login: root
+login[107]: root login on 'console'
+-sh: can't access tty; job control turned off
+# 
+# 
+# 
+# 
+# ls
+# cd /home/bin/
+# ls
+aaa                             libncurses.so.5
+devm                            libncurses.so.5.9
+ftm                             libreadline.so.7
+hal                             libreadline.so.7.0
+libcap.so.2                     libvtss_api_serval_lite.so
+libcap.so.2.25                  libvtss_api_serval_lite.so.xwl
+libcrypto.so.1.0.0              softlink.sh
+libhsl_cli.so                   vtss_miniapp_serval_lite
+libhsl_drv.so                   vtysh
+libhsl_mux.so                   wjr.sh
+libncurses.so
+# cat softlink.sh 
+export LD_LIBRARY_PATH=/home/bin
+
+ln -fs libcap.so.2.25 libcap.so.2
+ln -fs libreadline.so.7.0 libreadline.so.7
+ln -fs libncurses.so.5.9 libncurses.so.5
+# 
+# 
+# export LD_LIBRARY_PATH=/home/bin
+# 
+# 
+# ls
+aaa                             libncurses.so.5
+devm                            libncurses.so.5.9
+ftm                             libreadline.so.7
+hal                             libreadline.so.7.0
+libcap.so.2                     libvtss_api_serval_lite.so
+libcap.so.2.25                  libvtss_api_serval_lite.so.xwl
+libcrypto.so.1.0.0              softlink.sh
+libhsl_cli.so                   vtss_miniapp_serval_lite
+libhsl_drv.so                   vtysh
+libhsl_mux.so                   wjr.sh
+libncurses.so
+# ./devm &
+# Connect message queue failed, key:6,id:-1
+kernel.msgmax = 10000
+kernel.msgmnb = 10000000
+Create message queue 1 successful
+Create message queue 2 successful
+Create message queue 5 successful
+Create message queue 9 successful
+Create message queue 3 successful
+Create message queue 8 successful
+Create message queue 101 successful
+Create message queue 100 successful
+Create message queue 103 successful
+Create message queue 102 successful
+Create message queue 11 successful
+
+# 
+# 
+# ./hal &
+# Connect message queue failed, key:6,id:-1
+Initialize spidrv successfully
+Initialize i2cdrv successfully
+# ./Using UIO: /dev/uio0
+Mapped register memory @ 0x7500a000
+Chipid: 174160e9
+Detected 'Serval' board, 7 ports
+ifmSe[  467.606751] VLAN 1 DOWN!
+
+# 
+# 
+# ./ifm -d
+-sh: ./ifm: not found
+# [  473.725131] VLAN 1 UP!
+
+# 
+# 
+# 
+# ls
+aaa                             libncurses.so.5
+devm                            libncurses.so.5.9
+ftm                             libreadline.so.7
+hal                             libreadline.so.7.0
+libcap.so.2                     libvtss_api_serval_lite.so
+libcap.so.2.25                  libvtss_api_serval_lite.so.xwl
+libcrypto.so.1.0.0              softlink.sh
+libhsl_cli.so                   vtss_miniapp_serval_lite
+libhsl_drv.so                   vtysh
+libhsl_mux.so                   wjr.sh
+libncurses.so
+# ./vtysh 
+Connect message queue failed, key:6,id:-1
+Could not load host key: /home/bin/ssh_host_rsa_key
+Could not load host key: /home/bin/ssh_host_dsa_key
+file /home/cfg/config.init not exist
+
+Hello, this is Huahuan (version IPRAN V001R001 ).
+
+User Access Verification
+
+[  489.126661] sched: RT throttling activated
+Hios(config)# 
+Hios(config)# 
+Hios(config)# 
+Hios(config)# 

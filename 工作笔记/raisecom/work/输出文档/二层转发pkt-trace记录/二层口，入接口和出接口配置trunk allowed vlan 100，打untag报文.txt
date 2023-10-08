@@ -1,0 +1,460 @@
+CTC_CLI(ctc-sdk)# 
+CTC_CLI(ctc-sdk)# 
+CTC_CLI(ctc-sdk)# diag trigger pkt-trace mode network-packet 
+CTC_CLI(ctc-sdk)# show diag pkt-trace detail                 
+Show Diag Packet Trace:
+--------------------------------
+Dest Type           :Drop
+Drop Reason         :6
+Drop Description    :Destination check fail
+Current Position    :IPE
+--------------------------------
+Detail Path Info:
+------------------------------------------------
+
+1st Parsing
+    mac-da                   :0000.0000.00ff
+    mac-sa                   :0000.0000.ffff
+    ether-type               :0x00000800
+    layer2-ext-type          :0
+    layer3-type              :L3TYPE_IPV4
+    ip-protocol              :0x00000001
+    ip-da                    :192.168.200.1
+    ip-sa                    :192.168.200.33
+    layer3-ext-type          :0
+    layer4-type              :L4TYPE_ICMP
+    l2-decoder-index         :1
+    l3-decoder-index         :2
+    l4-decoder-index         :5
+
+SCL
+
+--SCL Decoder Info
+    global-port              :10
+    local-port               :10
+    logic-port               :31
+    udf-hit-index            :509
+    vlan-num                 :1
+    pkt-svlan-id             :100
+    stag-cos                 :0
+    stag-cfi                 :0
+    l2-type                  :ETHV2
+    l2-decode-index          :2
+    l3-type                  :IPV4
+    l3-offset                :18
+    l3-decode-index          :2
+    frag-info                :0
+    ip-options               :0
+    ip-pkt-len-range-id      :0
+    ip-hdr-error             :0
+    l4-type                  :ICMP
+    l4-offset                :38
+    l4-decode-index          :5
+    l4-user-type             :6
+    parser-len               :86
+    mux-destination          :0
+    tcp-data-offset          :0
+    l4-port-range-bimap      :0x00000000
+    ecid                     :0
+    name-space               :0
+    is-vxlan                 :0
+    is-cloud-sec             :0
+    hmac-check-en            :0
+
+--SCL UDF Decoder
+    udf-lkup                 :HIT
+    udf-hit-index            :3
+    udf-data                 :08005F5D000100013132333435363738
+
+--SCL L2 Decoder
+    mac-da                   :0000.0000.0011
+    mac-sa                   :0000.0000.1111
+    ether-type               :2048
+    svlan-id                 :100
+    cvlan-id                 :0
+    data0                    :0x00006948
+    data1                    :0x0000c0a8
+
+--SCL L3 Decoder
+    data0                    :0xc0a8c801
+    data1                    :0x35363738
+    data2                    :0x31323334
+    data3                    :0x00010001
+    data4                    :0xc0a8c821
+    data5                    :0x08005f5d
+    data6                    :0x00010001
+    data7                    :0x31323334
+    data8                    :0x00004500
+    data9                    :0x0000c801
+    data10                   :0x00000001
+    data11                   :0x00000040
+
+--SCL L4 Decoder
+    data0                    :0x31323334
+    data1                    :0x35363738
+    data2                    :0x00000000
+    data3                    :0x6b6c6d6e
+    data4                    :0x00000800
+    data5                    :0x00005f5d
+
+--SCL Lookup Info
+    ad-type-0                :USERID
+    hash-0-lookup-result     :HIT-DEFAULT-ENTRY
+    key-index                :9908
+    key-name                 :DsUserIdDoubleVlanPortHashKey
+    ad-index                 :32276
+    ad-name                  :DsUserId
+    hash-1-lookup-result     :HIT-DEFAULT-ENTRY
+    key-index                :3660
+    key-name                 :DsUserId1SvlanPortHashKey
+    ad-index                 :15892
+    ad-name                  :DsUserId1
+    tcam-2-lookup-result     :HIT-NONE
+    tcam-3-lookup-result     :HIT-NONE
+
+Interface Mapper
+    source-port              :0x0000000a
+    vlan-ptr                 :0
+    bridge-port              :YES
+    route-port               :NO
+
+Decapsulation
+
+Lookup Manager
+
+--UDF Decoder
+    udf-lkup                 :HIT
+    key-index                :509
+    udf-data                 :08005F5D000100013132333435363738
+
+--Outer L2 Decoder
+    outer-mac-da             :0000.0000.00ff
+    outer-mac-sa             :0000.0000.ffff
+    outer-ether-type         :0x00000800
+    outer-svlan-id           :0
+    outer-scos               :0
+    outer-scfi               :0
+    outer-cvlan-id           :0
+    outer-ccos               :0
+    outer-ccfi               :0
+    outer-data0              :0x0000c821
+    outer-data1              :0x0000c0a8
+
+--Outer L3 Decoder
+    outer-data0              :0xc0a8c801
+    outer-data1              :0x35363738
+    outer-data2              :0x31323334
+    outer-data3              :0x00010001
+    outer-data4              :0xc0a8c821
+    outer-data5              :0x08005f5d
+    outer-data6              :0x00010001
+    outer-data7              :0x31323334
+    outer-data8              :0x00004500
+    outer-data9              :0x0000c801
+    outer-data10             :0x00000001
+    outer-data11             :0x00000040
+
+--Outer L4 Decoder
+    outer-data0              :0x31323334
+    outer-data1              :0x35363738
+    outer-data2              :0x00000000
+    outer-data3              :0x6b6c6d6e
+    outer-data4              :0x00000800
+    outer-data5              :0x00005f5d
+    inner-macsa-lookup       :TRUE
+    macda-lookup             :ENABLE
+    key-macda                :0000.0000.00ff
+    key-fid                  :0
+    macsa-lookup             :ENABLE
+    key-macsa                :0000.0000.ffff
+    key-fid                  :0
+    efd-aging-cnt            :8
+    efd-detect-cnt           :0
+    efd-cpu-access-cnt       :0
+    efd-insert-cnt           :0
+    efd-update-cnt           :0
+    efd-hash-conflict-cnt    :0
+
+Layer2 Bridging
+    macda-lookup             :ENABLE
+    key-type                 :MAC
+    mac-da                   :0000.0000.00ff
+    fid                      :0
+    macda-lookup-result      :HIT-DEFAULT-ENTRY
+    bridge-fid               :0
+    ad-name                  :DsMac
+    ad-index                 :0
+    bridge-stromctl          :ENABLE
+
+Per-hop Behavior
+    phb-color                :Green
+    phb-prio                 :0
+    phb-classified-cfi       :0
+    phb-classified-cos       :0
+    phb-classified-dscp      :0
+    phb-classified-tc        :0
+
+IPE OAM
+
+ACL/TCAM Processing
+    exception-id             :63
+    from-stk                 :N
+    mac-known                :N
+    log-vector               :0x00000000
+    ltid-hit0                :HIT-DEFAULT-ENTRY
+    acl-use-outer            :Yes
+    ltid-key                 :1C000C000000013000000000A0210000
+    ltid-ad-index            :27
+    lkup-key0                :00000000 C0A8C801 00000800 00B60000 803B3100 
+
+ 
+    exception-id             :63
+    from-stk                 :N
+    mac-known                :N
+    log-vector               :0x00000000
+    ltid-hit1                :HIT-DEFAULT-ENTRY
+    acl-use-outer            :Yes
+    ltid-key                 :1C000C000000013000000000A0210000
+    ltid-ad-index            :27
+    TCAM1-lookup-result      :HIT-NONE
+    key-type                 :FWD_EXT_KEY
+    lkup-key1                :00000000 FFFF0000 000A5F5D 06400800 D58B0307 
+
+ 
+    exception-id             :63
+    from-stk                 :N
+    mac-known                :N
+    log-vector               :0x00000000
+    ltid-hit2                :HIT-DEFAULT-ENTRY
+    acl-use-outer            :Yes
+    ltid-key                 :1C000C000000013000000000A0210000
+    ltid-ad-index            :27
+    lkup-key2                :C0A8C821 00FF0000 1000FFFF 3204E000 FFCB4040 
+
+ 
+    exception-id             :63
+    from-stk                 :N
+    mac-known                :N
+    log-vector               :0x00000000
+    ltid-hit3                :HIT-DEFAULT-ENTRY
+    acl-use-outer            :Yes
+    ltid-key                 :1C000C000000013000000000A0210000
+    ltid-ad-index            :16
+    lkup-key3                :001F0001 00005F5D 00FF000A 32600B00 AAA0F412 
+
+ 
+    exception-id             :63
+    from-stk                 :N
+    mac-known                :N
+    log-vector               :0x00000000
+    ltid-hit4                :HIT-DEFAULT-ENTRY
+    acl-use-outer            :Yes
+    ltid-key                 :1C000C000000013000000000A0210000
+    ltid-ad-index            :16
+    TCAM4-lookup-result      :HIT-NONE
+    key-type                 :MAC_KEY
+    lkup-key4                :00000000 00000000 08000000 FFFF0000 80300800 
+
+ 
+    exception-id             :63
+    from-stk                 :N
+    mac-known                :N
+    log-vector               :0x00000000
+    ltid-hit5                :HIT-DEFAULT-ENTRY
+    acl-use-outer            :Yes
+    ltid-key                 :1C000C000000013000000000A0210000
+    ltid-ad-index            :19
+    TCAM5-lookup-result      :HIT-NONE
+    key-ltid                 :0
+    key-length               :160(bit)
+    lkup-key5                :00000000 00000000 00000000 00000000 00000000 
+
+ 
+    exception-id             :63
+    from-stk                 :N
+    mac-known                :N
+    log-vector               :0x00000000
+    ltid-hit6                :HIT-DEFAULT-ENTRY
+    acl-use-outer            :Yes
+    ltid-key                 :1C000C000000013000000000A0210000
+    ltid-ad-index            :19
+    TCAM6-lookup-result      :HIT-NONE
+    key-ltid                 :0
+    key-length               :160(bit)
+    lkup-key6                :00000000 00000000 00000000 00000000 00000000 
+
+ 
+    exception-id             :63
+    from-stk                 :N
+    mac-known                :N
+    log-vector               :0x00000000
+    ltid-hit7                :HIT-DEFAULT-ENTRY
+    acl-use-outer            :Yes
+    ltid-key                 :1C000C000000013000000000A0210000
+    ltid-ad-index            :19
+    TCAM7-lookup-result      :HIT-NONE
+    key-ltid                 :0
+    key-length               :160(bit)
+    lkup-key7                :00000000 00000000 00000000 00000000 00000000 
+
+ 
+    exception-id             :63
+    from-stk                 :N
+    mac-known                :N
+    log-vector               :0x00000000
+    ltid-hit8                :HIT-DEFAULT-ENTRY
+    acl-use-outer            :Yes
+    ltid-key                 :1C000C000000013000000000A0210000
+    ltid-ad-index            :20
+    lkup-key8                :00000000 C0A8C801 000000FF 00006014 FFF4FFF0 
+
+ 
+    exception-id             :63
+    from-stk                 :N
+    mac-known                :N
+    log-vector               :0x00000000
+    ltid-hit9                :HIT-DEFAULT-ENTRY
+    acl-use-outer            :Yes
+    ltid-key                 :1C000C000000013000000000A0210000
+    ltid-ad-index            :20
+    TCAM9-lookup-result      :HIT-NONE
+    key-type                 :MAC_IPV4_KEY
+    lkup-key9                :00000000 00000000 000A0800 00204E0B 80040000 
+
+ 
+    exception-id             :63
+    from-stk                 :N
+    mac-known                :N
+    log-vector               :0x00000000
+    ltid-hit10               :HIT-DEFAULT-ENTRY
+    acl-use-outer            :Yes
+    ltid-key                 :1C000C000000013000000000A0210000
+    ltid-ad-index            :20
+    lkup-key10               :C0A8C821 FFFF0000 08005F5D 60000000 D554DDD4 
+
+ 
+    exception-id             :63
+    from-stk                 :N
+    mac-known                :N
+    log-vector               :0x00000000
+    ltid-hit11               :HIT-DEFAULT-ENTRY
+    acl-use-outer            :Yes
+    ltid-key                 :1C000C000000013000000000A0210000
+    ltid-ad-index            :28
+    lkup-key11               :00000000 00000000 FFFF0800 000A0000 800C7601 
+
+ 
+    exception-id             :63
+    from-stk                 :N
+    mac-known                :N
+    log-vector               :0x00000000
+    ltid-hit12               :HIT-DEFAULT-ENTRY
+    acl-use-outer            :Yes
+    ltid-key                 :1C000C000000013000000000A0210000
+    ltid-ad-index            :28
+    TCAM12-lookup-result     :HIT-NONE
+    key-type                 :COPP_KEY
+    lkup-key12               :C0A8C821 FFFF5F5D 50000800 04000204 800C0000 
+
+ 
+    exception-id             :63
+    from-stk                 :N
+    mac-known                :N
+    log-vector               :0x00000000
+    ltid-hit13               :HIT-DEFAULT-ENTRY
+    acl-use-outer            :Yes
+    ltid-key                 :1C000C000000013000000000A0210000
+    ltid-ad-index            :28
+    lkup-key13               :C0A8C801 45000052 00FF0000 004E0000 800C3003 
+
+ 
+    exception-id             :63
+    from-stk                 :N
+    mac-known                :N
+    log-vector               :0x00000000
+    ltid-hit14               :HIT-DEFAULT-ENTRY
+    acl-use-outer            :Yes
+    ltid-key                 :1C000C000000013000000000A0210000
+    ltid-ad-index            :30
+    lkup-key14               :08005F5D 00010001 31323334 35363738 800E4420 
+
+ 
+    exception-id             :63
+    from-stk                 :N
+    mac-known                :N
+    log-vector               :0x00000000
+    ltid-hit15               :HIT-DEFAULT-ENTRY
+    acl-use-outer            :Yes
+    ltid-key                 :1C000C000000013000000000A0210000
+    ltid-ad-index            :30
+    TCAM15-lookup-result     :HIT-NONE
+    key-type                 :UDF_KEY
+    lkup-key15               :0000001F 000A0800 08005F5D 0BFF0301 D55ED136 
+
+ 
+
+Storm Control
+    stormctl-color           :Green
+    stormctl-type            :Unknow-Ucast
+    stormctl-length          :82
+
+Learning
+    macsa-lookup             :ENABLE
+    mac-sa                   :0000.0000.ffff
+    fid                      :0
+    macsa-lookup-result      :HIT-DEFAULT-ENTRY
+    do-learning              :N
+
+Destination Processing
+    bypass-ipe               :No
+    dest-type                :DROP
+    ipe-drop                 :IPE_DISCARD_NO_FORWARDING_PTR
+
+CTC_CLI(ctc-sdk)#   
+CTC_CLI(ctc-sdk)# 
+CTC_CLI(ctc-sdk)# 
+CTC_CLI(ctc-sdk)# 
+CTC_CLI(ctc-sdk)# show vlan 100 all                          
+No.     Chip    Member  Tagged(gport)
+-------------------------------
+0       0       0x000A  Tagged
+1       0       0x000B  Tagged
+-------------------------------
+member port count:2
+
+Property                Value
+---------------------------------------
+receive en              1
+transmit en             1
+bridge en               1
+learning en             1
+fid                     100
+stpid                   0
+igmp snooping           0
+arp exception           NORMAL_FWD
+dhcp exception          NORMAL_FWD
+fip exception           FWD_AND_CPU
+ipv4 based l2mc enable  0
+ipv6 based l2mc enable  0
+ptp clock id            0
+drop unknown ucast      0
+drop unknown mcast      0
+drop unknown bcast      0
+unknown mcast to cpu    0
+mac authentication      0
+ingress acl en          0
+egress acl en           0
+
+CTC_CLI(ctc-sdk)# 
+CTC_CLI(ctc-sdk)# 
+CTC_CLI(ctc-sdk)# show l2 fdb detail by all                  
+Key Table : DsFibHost0MacHashKey 
+Ad Table  : DsMac 
+
+KEY-INDEX  AD-INDEX       MAC          FID    GPORT  Static  Pending      Flag     Hit
+---------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------
+Total Entry Num: 0
+Pending Entry Num: 0
+CTC_CLI(ctc-sdk)# 
+CTC_CLI(ctc-sdk)# 

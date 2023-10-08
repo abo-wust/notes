@@ -1,0 +1,28 @@
+interface trunk 22
+ip address 11.11.1.21/24
+ipv6 address 2002::21/64
+ipv6 address auto link-local 
+show  ip address 
+exit
+
+interface gigabitethernet 1/1/8
+trunk 22
+exit
+
+
+
+
+
+
+interface trunk 22
+ip address 11.11.1.20/24
+ipv6 address 2002::20/64
+ipv6 address auto link-local 
+show  ip address 
+exit
+
+interface gigabitethernet 1/1/8
+trunk 22
+exit
+
+

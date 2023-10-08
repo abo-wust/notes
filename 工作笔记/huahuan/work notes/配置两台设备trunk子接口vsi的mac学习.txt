@@ -1,0 +1,75 @@
+----------------第一台设备配置（在这台设备上show mac）---------------
+
+interface gigabitethernet 1/1/5
+ip address 192.168.20.2/24
+exit
+
+
+interface tunnel 1/1/5
+protocol gre 
+source 192.168.20.2 destination 192.168.20.1
+nexthop 192.168.20.1
+exit
+
+
+mpls
+mpls lsr-id 2.2.2.2
+vsi 1
+exit
+
+pw pw1
+peer 192.168.20.1 vc-id 1
+label in 123 out 123
+tunnel bind interface tunnel 1/1/5
+switch vsi 1 s
+end
+
+
+
+interface trunk 1
+exit
+
+interface gigabitethernet 1/1/7
+trunk 1
+exit
+
+interface trunk 1.1
+mode l2
+y
+encapsulate dot1q 4
+mpls  vsi 1
+exit
+
+
+
+------------------第二台设备配置------------------
+
+
+interface gigabitethernet 1/1/5
+ip address 192.168.20.2/24
+exit
+
+
+interface tunnel 1/1/5
+protocol gre 
+source 192.168.20.1 destination 192.168.20.2
+nexthop 192.168.20.2
+exit
+
+
+mpls
+mpls lsr-id 1.1.1.1
+vsi 1
+exit
+
+
+pw pw1
+peer 192.168.20.2 vc-id 1
+label in 123 out 123
+tunnel bind interface tunnel 1/1/5
+switch vsi 1 s
+end
+
+
+
+

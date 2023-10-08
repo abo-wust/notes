@@ -1,0 +1,189 @@
+{
+  "main": {
+    "id": "5122a12d6a7608fd",
+    "type": "split",
+    "children": [
+      {
+        "id": "a5bfef5dc48ca5f0",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "1ed21ed1855f1784",
+            "type": "leaf",
+            "state": {
+              "type": "kanban",
+              "state": {
+                "file": "看板1.md"
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "4ad0f1ab51b4a7c7",
+    "type": "split",
+    "children": [
+      {
+        "id": "076d37f0e5634ed9",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "b65b882a946f2839",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical"
+              }
+            }
+          },
+          {
+            "id": "0a7276e3b096a69a",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              }
+            }
+          },
+          {
+            "id": "75aeae5479264ea2",
+            "type": "leaf",
+            "state": {
+              "type": "starred",
+              "state": {}
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 420.5
+  },
+  "right": {
+    "id": "fd8b1e8396c8146e",
+    "type": "split",
+    "children": [
+      {
+        "id": "26d59493e29c09e0",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "6a9395d1d0d9a982",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "看板1.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              }
+            }
+          },
+          {
+            "id": "1b379291ce72ee34",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "看板1.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              }
+            }
+          },
+          {
+            "id": "50d0f5cbb24d234e",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true
+              }
+            }
+          },
+          {
+            "id": "7c67cb93ba742fb6",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "看板1.md"
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:打开快速切换": false,
+      "graph:查看关系图谱": false,
+      "canvas:新建白板": false,
+      "daily-notes:打开/创建今天的日记": false,
+      "templates:插入模板": false,
+      "command-palette:打开命令面板": false
+    }
+  },
+  "active": "1ed21ed1855f1784",
+  "lastOpenFiles": [
+    "工作笔记/raisecom/SSL VPN使用说明.md",
+    "看板1.md",
+    "test title @{2023-04-29}.md",
+    "日记周报/2023-04-28.md",
+    "数据结构/链表/内核中的双链表操作函数.md",
+    "日记周报",
+    "数据结构/链表/Linux内核中的链表.md",
+    "2023-04-28.md",
+    "工作笔记/环境搭建与配置/CMD中 telnet 不是内部或外部命令.md",
+    "工作笔记/环境搭建与配置/CMD中 Ping不是内部或外部命令.md",
+    "工作笔记/环境搭建与配置/vscode/变量颜色和字体设置设置.md",
+    "工作笔记/环境搭建与配置/vscode/无法在这个大型工作区文件夹中监视文件更改.md",
+    "工作笔记/环境搭建与配置/vscode/images/Pasted image 20230427170408.png",
+    "工作笔记/环境搭建与配置/vscode/images/Image 4.png",
+    "工作笔记/环境搭建与配置/vscode/images/Image 3.png",
+    "工作笔记/环境搭建与配置/vscode/images/Pasted image 20230427170213.png",
+    "工作笔记/环境搭建与配置/vscode/images/Image 2.png",
+    "工作笔记/环境搭建与配置/vscode/images/Pasted image 20230427165850.png",
+    "工作笔记/环境搭建与配置/vscode/images/Pasted image 20230427165744.png",
+    "工作笔记/环境搭建与配置/vscode/images/Pasted image 20230427165138.png",
+    "工作笔记/环境搭建与配置/vscode/images/Pasted image 20230427165305.png",
+    "工作笔记/环境搭建与配置/vscode/Windows下vscode的终端配置.md",
+    "images/Image2.png.md",
+    "images",
+    "工作笔记/环境搭建与配置/vscode/images/Image 1.png",
+    "工作笔记/环境搭建与配置/Ubuntu环境配置/远程到Linux后会发出Windows上的提示声音.md",
+    "工作笔记/环境搭建与配置/Ubuntu环境配置/双网卡配置.md",
+    "工作笔记/环境搭建与配置/Ubuntu环境配置/图标消失.md",
+    "工作笔记/环境搭建与配置/Ubuntu环境配置/python安装.md",
+    "工作笔记/环境搭建与配置/Ubuntu环境配置/vscode安装.md",
+    "工作笔记/环境搭建与配置/Ubuntu环境配置/开启telnet服务.md",
+    "工作笔记/环境搭建与配置/Ubuntu环境配置/vim安装.md",
+    "工作笔记/环境搭建与配置/Ubuntu环境配置/GCC安装.md",
+    "工作笔记/环境搭建与配置/Ubuntu环境配置/替换源地址.md",
+    "工作笔记/环境搭建与配置/Ubuntu环境配置/启动卡在logo界面.md",
+    "工作笔记/环境搭建与配置/Ubuntu环境配置/su命令切换到root用户.md",
+    "C, C++/C 语言数组在内存中是怎样表示的？.md",
+    "工作笔记/环境搭建与配置/Ubuntu环境配置/配置tftp服务.md",
+    "工作笔记/环境搭建与配置/Ubuntu环境配置"
+  ]
+}
