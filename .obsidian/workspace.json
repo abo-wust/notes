@@ -4,16 +4,16 @@
     "type": "split",
     "children": [
       {
-        "id": "00a2aa5b02616f10",
+        "id": "5b8afc455429b296",
         "type": "tabs",
         "children": [
           {
-            "id": "456eb345cfc7154d",
+            "id": "2e48007a174da982",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Linux/小技巧/grep命令使用.md",
+                "file": "工作笔记/资料/以太网接口/未命名.md",
                 "mode": "source",
                 "source": false
               }
@@ -93,7 +93,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "Linux/小技巧/grep命令使用.md",
+                "file": "工作笔记/资料/以太网接口/未命名.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -110,7 +110,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "Linux/小技巧/grep命令使用.md",
+                "file": "工作笔记/资料/以太网接口/未命名.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -133,7 +133,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "Linux/小技巧/grep命令使用.md"
+                "file": "工作笔记/资料/以太网接口/未命名.md"
               }
             }
           },
@@ -165,8 +165,22 @@
       "command-palette:打开命令面板": false
     }
   },
-  "active": "456eb345cfc7154d",
+  "active": "2e48007a174da982",
   "lastOpenFiles": [
+    "工作笔记/资料/以太网接口/images/Pasted image 20231012093828.png",
+    "工作笔记/资料/以太网接口/images/Pasted image 20231012093812.png",
+    "工作笔记/资料/以太网接口/images/Pasted image 20231012093749.png",
+    "工作笔记/资料/以太网接口/images/Pasted image 20231012093729.png",
+    "工作笔记/资料/以太网接口/images/Pasted image 20231012093714.png",
+    "工作笔记/资料/以太网接口/images/Pasted image 20231012093652.png",
+    "工作笔记/资料/以太网接口/images/Pasted image 20231012093618.png",
+    "工作笔记/资料/以太网接口/images",
+    "计算机网络、标准协议/L2/vlan/什么是Super VLAN 为什么需要Super VLAN？.md",
+    "工作笔记/资料/以太网接口/未命名.md",
+    "工作笔记/资料/以太网接口",
+    "计算机网络、标准协议/L2/vlan/Super VLAN 技术.md",
+    "工具使用/git/重命名目录并推送到GitHub后，旧目录仍然存在.md",
+    "Linux/小技巧/grep命令使用.md",
     "工作笔记/环境搭建与配置/Ubuntu环境配置/ifconfig 命令未找到.md",
     "工作笔记/环境搭建与配置/Ubuntu环境配置/GCC安装.md",
     "工作笔记/环境搭建与配置/Ubuntu环境配置/替换源地址.md",
@@ -195,24 +209,10 @@
     "计算机网络、协议/L2/vlan/VLAN隔离.md",
     "计算机网络、协议/L2/PVLAN 技术白皮书.pdf",
     "计算机网络、协议/L2/vlan/Super VLAN 技术.md",
-    "计算机网络、协议/L2/vlan/MUX VLAN.md",
-    "计算机网络、协议/L2/vlan/Isolated-User VLAN 技术.md",
-    "计算机网络、协议/L2/vlan/相同网段，不同VLAN间通信的三种方式.md",
-    "计算机网络、协议/L2/vlan/什么是Super VLAN 为什么需要Super VLAN？.md",
-    "计算机网络、协议/L2/vlan/利用单臂路由实现VLAN间路由.md",
-    "计算机网络、协议/L2/vlan/GVRP.md",
-    "工作笔记/raisecom/work/输出文档/VLAN QinQ的基本原理与芯片实现.pptx",
-    "工作笔记/raisecom/work/输出文档/二层转发基本原理与芯片实现.docx",
     "工作笔记/OTN/images/Pasted image 20230412142204.png",
     "工作笔记/raisecom/images/Pasted image 20230506150104.png",
     "工作笔记/raisecom/images/Pasted image 20230506145735.png",
     "工作笔记/raisecom/images/Pasted image 20230506143938.png",
-    "工作笔记/raisecom/images/Pasted image 20230506141343.png",
-    "工作笔记/raisecom/images/Pasted image 20230506114813.png",
-    "工作笔记/raisecom/images/Pasted image 20230506112829.png",
-    "工作笔记/raisecom/images/Pasted image 20230506105903.png",
-    "工作笔记/raisecom/images/Pasted image 20230524152407.png",
-    "工作笔记/raisecom/images/Pasted image 20230524152347.png",
     "日记周报/2023-05/未命名.canvas"
   ]
 }
