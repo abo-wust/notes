@@ -4,16 +4,16 @@
     "type": "split",
     "children": [
       {
-        "id": "5b8afc455429b296",
+        "id": "11633c2b280cfb23",
         "type": "tabs",
         "children": [
           {
-            "id": "2e48007a174da982",
+            "id": "c998efd1476bb89f",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "工作笔记/资料/以太网接口/未命名.md",
+                "file": "工具使用/Windows/win键失灵.md",
                 "mode": "source",
                 "source": false
               }
@@ -93,7 +93,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "工作笔记/资料/以太网接口/未命名.md",
+                "file": "工具使用/Windows/win键失灵.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -110,7 +110,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "工作笔记/资料/以太网接口/未命名.md",
+                "file": "工具使用/Windows/win键失灵.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -133,7 +133,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "工作笔记/资料/以太网接口/未命名.md"
+                "file": "工具使用/Windows/win键失灵.md"
               }
             }
           },
@@ -165,8 +165,32 @@
       "command-palette:打开命令面板": false
     }
   },
-  "active": "2e48007a174da982",
+  "active": "c998efd1476bb89f",
   "lastOpenFiles": [
+    "日常随笔/收藏网页.md",
+    "工具使用/Windows/win键失灵.md",
+    "工具使用/Windows",
+    "日常随笔/北京公积金提取.md",
+    "日常随笔/images/Pasted image 20221202002340.png",
+    "日常随笔/一种多CPU协同工作的方法和设备.md",
+    "日记周报/2023/2023-09.md",
+    "计算机网络、标准协议/L2/vlan/images/Pasted image 20231027105502.png",
+    "计算机网络、标准协议/L2/vlan/Cisco PVLAN技术.md",
+    "工作笔记/资料/以太网接口/MII、RMII、GMII接口简介.md",
+    "工作笔记/raisecom/02 部门规范/ppt2EB2.tmp",
+    "工作笔记/raisecom/02 部门规范/ppt30D.tmp",
+    "工作笔记/raisecom/02 部门规范/pptF1E5.tmp",
+    "工作笔记/raisecom/02 部门规范/pptA4AF.tmp",
+    "工作笔记/raisecom/02 部门规范/ppt2AF.tmp",
+    "工作笔记/raisecom/02 部门规范/ppt185.tmp",
+    "工作笔记/raisecom/02 部门规范/ppt4B.tmp",
+    "工作笔记/raisecom/02 部门规范/pptF9B3.tmp",
+    "工作笔记/raisecom/02 部门规范/pptB621.tmp",
+    "日记周报/2023/2023-08.md",
+    "日记周报/2023/2023-07.md",
+    "日记周报/2023/2023-06.md",
+    "工具使用/git/windows下使用git bash时中文路径显示为反斜杠和数字.md",
+    "日记周报/2023/2023-10.md",
     "工作笔记/资料/以太网接口/images/Pasted image 20231012093828.png",
     "工作笔记/资料/以太网接口/images/Pasted image 20231012093812.png",
     "工作笔记/资料/以太网接口/images/Pasted image 20231012093749.png",
@@ -174,10 +198,8 @@
     "工作笔记/资料/以太网接口/images/Pasted image 20231012093714.png",
     "工作笔记/资料/以太网接口/images/Pasted image 20231012093652.png",
     "工作笔记/资料/以太网接口/images/Pasted image 20231012093618.png",
-    "工作笔记/资料/以太网接口/images",
     "计算机网络、标准协议/L2/vlan/什么是Super VLAN 为什么需要Super VLAN？.md",
     "工作笔记/资料/以太网接口/未命名.md",
-    "工作笔记/资料/以太网接口",
     "计算机网络、标准协议/L2/vlan/Super VLAN 技术.md",
     "工具使用/git/重命名目录并推送到GitHub后，旧目录仍然存在.md",
     "Linux/小技巧/grep命令使用.md",
@@ -190,29 +212,7 @@
     "工作笔记/环境搭建与配置/Ubuntu环境配置/配置tftp服务.md",
     "工作笔记/环境搭建与配置/Ubuntu环境配置/开启telnet服务.md",
     "工作笔记/环境搭建与配置/Ubuntu环境配置/su命令切换到root用户.md",
-    "工作笔记/环境搭建与配置/Ubuntu环境配置/vim安装.md",
-    "Linux/内核/搭建编译、调试环境.md",
-    "日记周报/2023/2023-09.md",
-    "日记周报/2023/2023-08.md",
-    "计算机网络、协议/m-lag/M-LAG简介.md",
-    "计算机网络、协议/L2/vxlan/EVPN VXLAN技术介绍.pdf",
-    "计算机网络、协议/L2/vxlan/未确认 305023.crdownload",
-    "计算机网络、协议/L2/vxlan",
-    "计算机网络、协议/L2/vlan/PVLAN技术白皮书.pdf",
-    "计算机网络、协议/m-lag/华为CloudEngine 8800&7800&6800&5800系列交换机 M-LAG技术白皮书.pdf",
-    "计算机网络、协议/m-lag/CloudEngine 16800, 12800, 8800, 6800, 5800系列交换机 M-LAG最佳实践.chm",
-    "工作笔记/raisecom/ctc手册相关/丢包错误码.md",
-    "计算机网络、协议/m-lag",
-    "日记周报/2023/2023-07.md",
-    "日记周报/2023/月度总结.md",
-    "日记周报/2023/2023年5月工作.md",
-    "计算机网络、协议/L2/vlan/VLAN隔离.md",
-    "计算机网络、协议/L2/PVLAN 技术白皮书.pdf",
-    "计算机网络、协议/L2/vlan/Super VLAN 技术.md",
     "工作笔记/OTN/images/Pasted image 20230412142204.png",
-    "工作笔记/raisecom/images/Pasted image 20230506150104.png",
-    "工作笔记/raisecom/images/Pasted image 20230506145735.png",
-    "工作笔记/raisecom/images/Pasted image 20230506143938.png",
     "日记周报/2023-05/未命名.canvas"
   ]
 }
