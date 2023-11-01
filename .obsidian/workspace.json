@@ -215,8 +215,10 @@
   },
   "active": "ece4bc31ce01a85d",
   "lastOpenFiles": [
-    "工具使用/git/未命名.md",
+    "工具使用/Windows/win键失灵.md",
     "工具使用/git/回车（CR）和换行符（LF）替换.md",
+    "工具使用/Windows",
+    "工具使用/git/未命名.md",
     "工作笔记/资料/以太网接口/以太网接口：物理层.md",
     "工作笔记/资料/以太网接口/MII、RMII、GMII接口简介.md",
     "计算机网络、标准协议/m-lag/M-LAG简介.md",
@@ -256,11 +258,9 @@
     "计算机网络、标准协议/L2/vlan/什么是Super VLAN 为什么需要Super VLAN？.md",
     "工作笔记/资料/以太网接口/images",
     "工作笔记/资料/以太网接口",
-    "计算机网络、标准协议/L2/vlan/Super VLAN 技术.md",
     "计算机网络、协议/L2/vxlan/EVPN VXLAN技术介绍.pdf",
     "计算机网络、协议/L2/vxlan/未确认 305023.crdownload",
     "计算机网络、协议/L2/vxlan",
-    "计算机网络、协议/L2/vlan/PVLAN技术白皮书.pdf",
     "日记周报/2023-05/未命名.canvas"
   ]
 }
