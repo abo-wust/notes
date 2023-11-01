@@ -2,5 +2,6 @@
   "accentColor": "",
   "interfaceFontFamily": "",
   "textFontFamily": "微软雅黑",
-  "theme": "obsidian"
+  "theme": "obsidian",
+  "translucency": false
 }

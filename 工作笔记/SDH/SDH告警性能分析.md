@@ -206,7 +206,7 @@ SDH告警性能分析2
 
 
   
-  .c114_ask{border:1px solid #cccccc;padding:6px 6px 8px 
+  .c114_ask{border:1px solid ##cccccc;padding:6px 6px 8px 
   6px;background:#FFF8C5;line-height:20px;font-size:12px;}.c114_ask 
   div{padding:5px 0px;text-align:center;}.c114_ask 
   a{color:#000;text-decoration:none;font-size:12px;}
