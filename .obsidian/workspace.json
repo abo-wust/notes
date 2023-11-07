@@ -61,7 +61,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "工具使用/git/回车（CR）和换行符（LF）替换.md",
+                "file": "虚拟化/dpdk/DPDK进阶高性能的学习路线.md",
                 "mode": "source",
                 "source": false
               }
@@ -142,7 +142,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "工具使用/git/回车（CR）和换行符（LF）替换.md",
+                "file": "虚拟化/dpdk/DPDK进阶高性能的学习路线.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -159,7 +159,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "工具使用/git/回车（CR）和换行符（LF）替换.md",
+                "file": "虚拟化/dpdk/DPDK进阶高性能的学习路线.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -182,7 +182,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "工具使用/git/回车（CR）和换行符（LF）替换.md"
+                "file": "虚拟化/dpdk/DPDK进阶高性能的学习路线.md"
               }
             }
           },
@@ -215,8 +215,29 @@
   },
   "active": "ece4bc31ce01a85d",
   "lastOpenFiles": [
-    "工具使用/Windows/win键失灵.md",
+    "虚拟化/dpdk/dpdk的路由查询算法.md",
+    "操作系统/IO处理/5种IO模型.md",
+    "虚拟化/dpdk/DPDK进阶高性能的学习路线.md",
+    "虚拟化/dpdk/深入理解DPDK程序设计.md",
+    "虚拟化/dpdk/images/Pasted image 20231107212823.png",
+    "虚拟化/dpdk/images/Pasted image 20231107212759.png",
+    "虚拟化/dpdk/images/Pasted image 20231107212747.png",
+    "虚拟化/dpdk/images/Pasted image 20231107212733.png",
+    "虚拟化/dpdk/images/Pasted image 20231107212650.png",
+    "虚拟化/dpdk/images/Pasted image 20231107212633.png",
+    "虚拟化/dpdk/images/Pasted image 20231107212606.png",
+    "虚拟化/dpdk/images/Pasted image 20231107212549.png",
+    "虚拟化/dpdk/images/Pasted image 20231107212521.png",
+    "虚拟化/dpdk/images/Pasted image 20231107212446.png",
+    "虚拟化/dpdk/images",
+    "操作系统/进程和线程/详解死锁.md",
+    "Linux/IPC通信/共享内存.md",
+    "操作系统/IO处理/images",
+    "操作系统/IO处理/深入理解 Linux IO 系统.md",
+    "操作系统/IO处理/epoll 是如何实现 IO 多路复用的.md",
     "工具使用/git/回车（CR）和换行符（LF）替换.md",
+    "操作系统/内存管理/基本知识和概念.md",
+    "工具使用/Windows/win键失灵.md",
     "工具使用/Windows",
     "工具使用/git/未命名.md",
     "工作笔记/资料/以太网接口/以太网接口：物理层.md",
@@ -225,16 +246,6 @@
     "计算机网络、标准协议/m-lag/什么是M-LAG.md",
     "工作笔记/raisecom/vlan qinq命令行配置逻辑.md",
     "计算机网络、标准协议/m-lag/华为CloudEngine 8800&7800&6800&5800系列交换机 M-LAG技术白皮书.pdf",
-    "计算机网络、标准协议/m-lag/images/Pasted image 20231031170640.png",
-    "计算机网络、标准协议/m-lag/images/Pasted image 20231031170622.png",
-    "计算机网络、标准协议/m-lag/images/Pasted image 20231031170605.png",
-    "计算机网络、标准协议/m-lag/images/Pasted image 20231031170542.png",
-    "计算机网络、标准协议/m-lag/images/Pasted image 20231031170447.png",
-    "计算机网络、标准协议/m-lag/images/Pasted image 20231031170427.png",
-    "计算机网络、标准协议/m-lag/images/Pasted image 20231031170359.png",
-    "计算机网络、标准协议/m-lag/images/Pasted image 20231031170321.png",
-    "计算机网络、标准协议/m-lag/images/Pasted image 20231031170237.png",
-    "计算机网络、标准协议/m-lag/images/Pasted image 20231031170216.png",
     "计算机网络、标准协议/m-lag/images",
     "Linux/小技巧/C语言宏高级用法.md",
     "Linux/小技巧/一句命令判断大小端.md",
@@ -245,22 +256,11 @@
     "工作笔记/raisecom/elps命令配置逻辑.md",
     "工作笔记/SDH/SDH告警性能分析.md",
     "工作笔记/SDH/PDH→SDH→MSTP→PTN→OTN.md",
-    "计算机网络、标准协议/arp/ARP状态机.md",
-    "计算机网络、标准协议/arp/ARP冲突检测.md",
-    "计算机网络、标准协议/arp/ARP安全.md",
-    "计算机网络、标准协议/L2/vlan/Cisco PVLAN技术.md",
-    "计算机网络、标准协议/L2/vlan/MUX VLAN.md",
     "计算机网络、标准协议/L2/vlan/PVLAN技术白皮书.pdf",
     "计算机网络、标准协议/L2/PVLAN 技术白皮书.pdf",
-    "计算机网络、标准协议/L2/vlan/VLAN隔离.md",
-    "日记周报/2023/2023-07.md",
-    "日记周报/2023/2023-10.md",
-    "计算机网络、标准协议/L2/vlan/什么是Super VLAN 为什么需要Super VLAN？.md",
     "工作笔记/资料/以太网接口/images",
     "工作笔记/资料/以太网接口",
     "计算机网络、协议/L2/vxlan/EVPN VXLAN技术介绍.pdf",
-    "计算机网络、协议/L2/vxlan/未确认 305023.crdownload",
-    "计算机网络、协议/L2/vxlan",
     "日记周报/2023-05/未命名.canvas"
   ]
 }
