@@ -13,50 +13,25 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "工作笔记/raisecom/vlan qinq命令行配置逻辑.md",
+                "file": "C, C++/小技巧/快速检查数组元素全部为零.md",
                 "mode": "source",
                 "source": false
               }
             }
           },
           {
-            "id": "ad20eb4854bb84d2",
+            "id": "6e04ec40bedf036e",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "计算机网络、标准协议/m-lag/什么是M-LAG.md",
-                "mode": "source",
-                "source": false
-              }
-            }
-          },
-          {
-            "id": "3ce9961f7c775ea4",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "计算机网络、标准协议/m-lag/M-LAG.md",
-                "mode": "source",
-                "source": false
-              }
-            }
-          },
-          {
-            "id": "9851c56afd915ecb",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "工作笔记/资料/以太网接口/MII、RMII、GMII接口简介.md",
+                "file": "C, C++/C, C++基础/printf 输出格式.md",
                 "mode": "source",
                 "source": false
               }
             }
           }
-        ],
-        "currentTab": 2
+        ]
       }
     ],
     "direction": "vertical"
@@ -114,7 +89,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 334.5
+    "width": 453.5
   },
   "right": {
     "id": "fd8b1e8396c8146e",
@@ -130,7 +105,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "计算机网络、标准协议/m-lag/M-LAG.md",
+                "file": "C, C++/小技巧/快速检查数组元素全部为零.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -147,7 +122,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "计算机网络、标准协议/m-lag/M-LAG.md",
+                "file": "C, C++/小技巧/快速检查数组元素全部为零.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -170,7 +145,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "计算机网络、标准协议/m-lag/M-LAG.md"
+                "file": "C, C++/小技巧/快速检查数组元素全部为零.md"
               }
             }
           },
@@ -201,39 +176,41 @@
       "command-palette:打开命令面板": false
     }
   },
-  "active": "3ce9961f7c775ea4",
+  "active": "2e48007a174da982",
   "lastOpenFiles": [
+    "Linux/小技巧/grep命令使用.md",
+    "C, C++/小技巧/快速检查数组元素全部为零.md",
+    "工具使用/git/同步创建远程仓库.md",
+    "C, C++/小技巧/检查mac地址.md",
+    "C, C++/C, C++基础/printf 输出格式.md",
+    "工作笔记/raisecom/vlan qinq命令行配置逻辑.md",
+    "C, C++/小技巧/C语言宏高级用法.md",
+    "Linux/小技巧/嵌入式开发笔记.md",
+    "C, C++/小技巧/C语言宏技巧.md",
+    "C, C++/小技巧",
+    "计算机网络、标准协议/m-lag/M-LAG.md",
+    "计算机网络、标准协议/mpls/MPLS基础.md",
+    "计算机网络、标准协议/vpn/参考博客.md",
+    "华为CloudEngine 8800&7800&6800&5800系列交换机 M-LAG技术白皮书.md",
+    "计算机网络、标准协议/m-lag/华为CloudEngine 8800&7800&6800&5800系列交换机 M-LAG技术白皮书.pdf",
+    "计算机网络、标准协议/m-lag/什么是M-LAG.md",
+    "工作笔记/raisecom/trunk命令行配置逻辑.md",
+    "工作笔记/资料/以太网接口/MII、RMII、GMII接口简介.md",
+    "数据结构/队列/无锁环形队列.md",
+    "虚拟化/dpdk/dpdk入门实践6——L2fwd二层通信和l3fwd三层通信.md",
+    "虚拟化/dpdk/深入理解DPDK程序设计.md",
+    "虚拟化/dpdk/未命名",
     "代码模块示例/消息队列/未命名.md",
     "工具使用/obsidian/复制代码块时自动添加行问题.md",
-    "Linux/小技巧/嵌入式开发笔记.md",
     "Linux/shell/Shell感叹号用法.md",
     "Linux/shell/经验 常用Shell脚本编写.md",
     "Linux/shell/shell教程/变量.md",
     "Linux/shell/shell教程/传递参数.md",
     "Linux/shell/shell教程/函数与函数参数.md",
-    "Linux/shell/shell教程/数组.md",
-    "Linux/shell/shell教程/执行Linux命令.md",
-    "Linux/shell/shell教程/注释.md",
-    "Linux/shell/shell教程/字符串.md",
-    "Linux/shell/shell教程/echo命令.md",
-    "Linux/shell/shell教程/流程控制/while循环.md",
-    "Linux/shell/shell教程/流程控制/until循环.md",
-    "Linux/shell/shell教程/流程控制/for循环.md",
-    "Linux/shell/shell教程/流程控制/跳出循环.md",
-    "Linux/shell/shell教程/流程控制/条件分支if else.md",
-    "Linux/shell/shell教程/流程控制/条件分支case esac.md",
-    "Linux/shell/shell教程/运算符/字符串运算符.md",
-    "Linux/shell/shell教程/运算符/文件测试运算符.md",
-    "Linux/shell/shell教程/运算符/算术运算符.md",
-    "Linux/shell/shell教程/运算符/逻辑运算符.md",
-    "Linux/shell/shell教程/运算符/基本运算符.md",
-    "Linux/shell/shell教程/运算符/关系运算符.md",
-    "Linux/shell/shell教程/运算符/布尔运算符.md",
     "工作笔记/资料/光模块/标准-SFF-8472_Rev_12.2.PDF",
     "工作笔记/资料/光模块/标准-SFF-8024.PDF",
     "工作笔记/资料/光模块/SFF-8472-R12.4-sfp+.pdf",
     "工具使用/Windows",
-    "计算机网络、标准协议/m-lag/华为CloudEngine 8800&7800&6800&5800系列交换机 M-LAG技术白皮书.pdf",
     "计算机网络、标准协议/m-lag/images/Pasted image 20231031170640.png",
     "计算机网络、标准协议/m-lag/images/Pasted image 20231031170622.png",
     "计算机网络、标准协议/m-lag/images/Pasted image 20231031170605.png",
@@ -247,8 +224,6 @@
     "计算机网络、标准协议/m-lag/images",
     "计算机网络、标准协议/L2/vlan/PVLAN技术白皮书.pdf",
     "计算机网络、标准协议/L2/PVLAN 技术白皮书.pdf",
-    "工作笔记/资料/以太网接口/images",
-    "工作笔记/资料/以太网接口",
     "日记周报/2023-05/未命名.canvas"
   ]
 }
