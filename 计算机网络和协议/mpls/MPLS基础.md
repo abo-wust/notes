@@ -89,15 +89,16 @@ MPLS报文与普通的IP报文相比增加了MPLS标签信息，MPLS标签的长
 
 **特殊标签表：**
 
-|**标签值**|**含义**|**描述**|
-|-------|------|------|
-|0|IPv4 Explicit NULL Label|表示该标签必须被弹出（即标签被剥掉），且报文的转发必须基于IPv4。如果出节点分配给倒数第二跳节点的标签值为0，则倒数第二跳LSR需要将值为0的标签正常压入报文标签值顶部，转发给最后一跳。最后一跳发现报文携带的标签值为0，则将标签弹出。|
-|1|Router Alert Label|只有出现在非栈底时才有效。类似于IP报文的“Router Alert Option”字段，节点收到Router Alert Label时，需要将其送往本地软件模块进一步处理。实际报文转发由下一层标签决定。如果报文需要继续转发，则节点需要将Router Alert Label压回标签栈顶。|
-|2|IPv6 Explicit NULL Label|表示该标签必须被弹出，且报文的转发必须基于IPv6。如果出节点分配给倒数第二跳节点的标签值为2，则倒数第二跳节点需要将值为2的标签正常压入报文标签值顶部，转发给最后一跳。最后一跳发现报文携带的标签值为2，则直接将标签弹出。|
-|3|Implicit NULL Label|倒数第二跳LSR进行标签交换时，如果发现交换后的标签值为3，则将标签弹出，并将报文发给最后一跳。最后一跳收到该报文直接进行IP转发或下一层标签转发。|
-|4～13|保留|\-|
-|14|OAM Router Alert Label|MPLS OAM（Operation Administration & Maintenance）通过发送OAM报文检测和通告LSP故障。OAM报文使用MPLS承载。OAM报文对于Transit LSR和倒数第二跳LSR（penultimate LSR）是透明的。|
-|15|保留|\-|
+| **标签值** | **含义** | **描述** |
+| ---- | ---- | ---- |
+| 0 | IPv4 Explicit NULL Label | 表示该标签必须被弹出（即标签被剥掉），且报文的转发必须基于IPv4。如果出节点分配给倒数第二跳节点的标签值为0，则倒数第二跳LSR需要将值为0的标签正常压入报文标签值顶部，转发给最后一跳。最后一跳发现报文携带的标签值为0，则将标签弹出。 |
+| 1 | Router Alert Label | 只有出现在非栈底时才有效。类似于IP报文的“Router Alert Option”字段，节点收到Router Alert Label时，需要将其送往本地软件模块进一步处理。实际报文转发由下一层标签决定。如果报文需要继续转发，则节点需要将Router Alert Label压回标签栈顶。 |
+| 2 | IPv6 Explicit NULL Label | 表示该标签必须被弹出，且报文的转发必须基于IPv6。如果出节点分配给倒数第二跳节点的标签值为2，则倒数第二跳节点需要将值为2的标签正常压入报文标签值顶部，转发给最后一跳。最后一跳发现报文携带的标签值为2，则直接将标签弹出。 |
+| 3 | Implicit NULL Label | 倒数第二跳LSR进行标签交换时，如果发现交换后的标签值为3，则将标签弹出，并将报文发给最后一跳。最后一跳收到该报文直接进行IP转发或下一层标签转发。 |
+| 4～13 | 保留 | \- |
+| 14 | OAM Router Alert Label | MPLS OAM（Operation Administration & Maintenance）通过发送OAM报文检测和通告LSP故障。OAM报文使用MPLS承载。OAM报文对于Transit LSR和倒数第二跳LSR（penultimate LSR）是透明的。 |
+| 15 | 保留 | \- |
+|  |  |  |
 
 **LSP的建立**
 
