@@ -1,0 +1,816 @@
+
+8800A设备的slot 1-4都是QSGMII接口，每个槽位4个serdes，每个serdes出4个gport，这样如果slot 1-4插的是RG8，那么只用其中的2个serdes
+
+验证：
+    将slot 1-4的背板口配置为扩展口，在这个扩展口上打环，然后其他面板口接仪表打流，验证这个背板口是否可用
+
+
+RG8板卡1/2/1接口配置扩展接口238、239（SDK命令）：
+bpe mux-demux port 63 vlan-base 100 port-base 238 extender-num 2 enable
+
+vlan add port 63 vlan 100
+vlan add port 63 vlan 101
+
+vlan add port 238 vlan 100
+vlan add port 239 vlan 101
+vlan add port 239 vlan 100
+vlan add port 238 vlan 101
+
+
+1/2/2口在设备命令行下配置加入vlan 20：
+portswitch
+switchport mode trunk
+switchport trunk allowed vlan 20 confirm
+
+
+仪表接1/2/1口打两条流：
+1、vlan (100, 20)，smac：00:10:94:00:00:10
+2、vlan (101, 21)，smac：00:10:94:00:00:11
+
+
+sdk下查看mac表：
+show l2 fdb detail by all   
+
+然后再配置1/2/2口加入vlan 21：
+switchport trunk allowed vlan add 21 
+
+
+
+
+升级mmc_paf文件：
+按Ctrl+U: Entry uboot shell
+输入boot里的密码：uboot!
+进入BOOT#界面后，输入if
+第一个flash按回车跳过，第二个mmc输入y，进行mmc的升级
+
+
+
+
+
+1、product目录增加文件夹
+其中注意devdef.h和moddef.h两个文件需要软链接到product_esw_ritp/127_iTN8800-A-RX10目录下的相同文件：
+ln -s ../../product_esw_ritp/127_iTN8800-A-RX10/devdef.h devdef.h
+ln -s ../../product_esw_ritp/127_iTN8800-A-RX10/moddef.h moddef.h
+
+2、编译RX10后再编译其他会出现“did you mean: -feliminate-unused-debug-types”编译错误，重新all clean后再编译，更新代码仍然报错，
+最后发现是RX10沿用RK8编译脚本中的CFLAGS和CXXFLAGS编译选项添加了“-feliminate-unused-debug-types”，关闭远程窗口重新登录编译通过。
+
+
+
+1、product_api_common.c文件的product_get_firmware_version函数中，536行RX10用哪个接口获取firmware版本？
+2、sspDevMgtHw.c文件的SSP_devmgt_hwapi_init函数中，1641行注册hwapi时使用哪个modid？
+
+3、面板口的link状态怎么报？面板口的要上报，那单板背板口的link是否也要上报？（ibc或者cpld？）
+4、聚合口怎么配置？面板口port-cross到背板口的时候，选择哪个背板口？还是说直接配置背板口的聚合，不管面板口，只把面板口当作一个数据收发单元？
+5、背板口25G扩展出的4个10G口是用的mux/demux，扩展口是有vlan的，那这四个面板口初始化的access-vlan固定死？
+6、主控的背板口和RX10单盘的背板口怎么配置？业务转发相当于是7132和8180端口间的收发，rx10是直接port-cross透传了，所以rx10单盘背板口不用配？
+7、主控对外呈现的是主控的10个10G口，那么配置的业务是配置在主控的这10个10G背板口，还是要ibc到单盘，因为单盘的面板口已经port-cross到单盘的背板口了，所以应该不应该在单盘的面板口上配业务
+
+8、mac学习、流控是否使能要同步主控的配置、扩展口使能基本qinq
+
+
+
+
+stp/lacp/oam一样01:80:c2开头的mac能看到直接转发到背板口，符合交叉的配置期望，pause帧没法转发，流控的配置需要主控下发到单盘，在面板口生效
+
+
+单盘的升级要和bsp确认方式，在单盘上用download命令升级板卡挂死，还没定位原因，看是否需要支持这个升级方式
+
+
+
+
+
+以下是我目前想到可能需要在单盘侧初始化做的事情，可以关注一下：
+1、不同槽位不同端口的扩展VLAN不一样，可以默认把所有VLAN都创建；
+2、我司设备默认关闭流控，需要在单盘上关闭流控，还需要做主控和单盘的流控IBC设置；主控上扩展口没有流控，必须在单盘上做；单盘侧背板口流控关闭；
+3、端口的映射关系、默认模式需要初始化；
+4、关闭端口的MAC学习；
+5、linkscan开启面板口的link中断，并监控中断消息，用来做快速开销；这里需要过滤背板口的link，背板口的link不能上报给主控；
+6、芯片默认可能对一些0180C20000XX的报文是丢弃或者送CPU，需要改成透传，由主控来完成对相关报文的处理；
+7、单盘侧面板口有扩展口和非扩展口，非扩展口是port-crosss来实现面板口和背板口的转发，扩展口是通过VLAN来实现转发，如果端口没有开启VLAN过滤会导致扩展面板口的报文从非扩展面板口出去，这里后期要看一下，如果存在该问题就需要开启非扩展面板口和非扩展背板口的VLAN过滤或者设置隔离；
+8、扩展面板口需要根据所在槽位及端口号设置默认VLAN和基本QINQ，端口加入默认VLAN；单盘侧扩展背板口要加入扩展VLAN和开启VLAN过滤；
+9、扩展口的MTU需要在单盘上做；需要增加对应的IBC；
+10、扩展口的双工、speed、admin down、端口统计等需要在单盘上做，需要增加对应的IBC；这里看看是否考虑所有面本口都在单盘上做，不再主控上做；
+11、非扩展口面板口和背板口的转发关系port-cross初始化；（主备背板口都初始化配置port-cross，然后和FCG一样双发选收？）
+
+
+
+
+1、快速开销（硬件在调）
+2、主控侧扩展口初始化梳理（主控配置接口vlan，转发正常能到单盘背板）
+3、ddm
+4、打流验证基本业务
+5、二三层业务测试
+
+6、面板口插千兆光模块，单盘侧的5口变成自协商模式，主控侧的背板口5口也变成自协商模式，但是单盘的背板口不是自协商的，导致主控和单盘背板口不link。怀疑是获取sfp模块类型错误，光模块不应该下发自协商
+
+
+
+
+
+硬件一共给了两组4*10G，4*25G，一组4*10G，4*25G接到主用主控，另一组4*10G，4*25G接到备用主控，这几个口怎么出10*10G面板口，由软件决定：
+背板的2个25G口，一分2，一共出4个10G口作为面板口，用muxvlan区分；
+背板口的4个10G口直出，加上两个25G口配置成10G口用，port-cross到面板口
+
+port 1-6 用直出口，配置面板口到背板口的port-cross
+port 7-10用muxport，背板口和面板口之间依靠vlan转发
+
+
+
+
+
+
+
+
+bpe mux-demux port 18 vlan-base 1012 port-base 238 extender-num 2 disable
+bpe mux-demux port 19 vlan-base 1014 port-base 236 extender-num 2 disable
+
+port 18 if-mode 10G XFI
+port 18 mac enable
+
+
+bpe mux-demux port 138 vlan-base 1016 port-base 234 extender-num 2 disable
+bpe mux-demux port 139 vlan-base 1018 port-base 232 extender-num 2 disable
+
+
+        rx10            nxu     
+        (master/slave)
+slot 6
+        27 / 31(xfi)    0
+        26 / 30(xfi)    4
+        25 / 29(xfi)    8
+        24 / 28(xfi)    9
+        47 / 63(cr)     24
+        44 / 60(cr)     25
+        46 / 62(cr)     26
+        45 / 61(cr)     27
+
+
+slot 8
+        27 / 31(xfi)    10
+        26 / 30(xfi)    14
+        25 / 29(xfi)    18
+        24 / 28(xfi)    19
+        47 / 63(cr)     52
+        44 / 60(cr)     53
+        46 / 62(cr)     54
+        45 / 61(cr)     55
+
+
+slot 11
+        27 / 31(xfi)    136
+        26 / 30(xfi)    137
+        25 / 29(xfi)    138
+        24 / 28(xfi)    139
+        47 / 63(cr)     140
+        44 / 60(cr)     141
+        46 / 62(cr)     142
+        45 / 61(cr)     143
+
+slot 12
+        27 / 31(xfi)    64
+        26 / 30(xfi)    65
+        25 / 29(xfi)    66
+        24 / 28(xfi)    67
+        47 / 63(cr)     68
+        44 / 60(cr)     69
+        46 / 62(cr)     70
+        45 / 61(cr)     71
+
+slot 13
+        27 / 31(xfi)    128
+        26 / 30(xfi)    129
+        25 / 29(xfi)    130
+        24 / 28(xfi)    131
+        47 / 63(cr)     132
+        44 / 60(cr)     133
+        46 / 62(cr)     134
+        45 / 61(cr)     135
+
+
+
+chip serdes 40 loopback external enable
+chip serdes 40 loopback external disable
+
+
+
+portswitch
+switchport mode trunk
+switchport trunk allowed vlan 100 confirm
+
+
+
+
+仪表        8.30
+3/7 <-----> 1/1/2
+
+8.30           4.36
+1/12/3 <-----> 1/3/22
+1/12/6 <-----> 1/3/24
+
+
+4.36           4.14
+1/3/23 <-----> 1/5/8
+
+
+
+1、手工主备模式下倒换和回切都超时，倒换2000ms左右，回切在500ms左右
+2、手工负载分担模式下，回切超时，在500ms左右
+
+
+A0_8.30(debug)#show rnet interface tengigabitethernet 1/12/3
+tengigabitethernet1/12/3
+    tengigabitethernet1/12/3 is DOWN RUNNING MULTICAST PROMISC 
+    Dev type is AP
+    MODE is SWITCH
+         MODE is L3
+    MAC address is 4CB9.1131.0100
+    MTU 1500 bytes
+    TCP MSS 0 bytes
+         Vrf ID is 0 
+         Vpn ID is 0 
+    Ifindex is 272728075(1041800b) ,refcount 8
+
+A0_8.30(debug)#show rnet interface tengigabitethernet 1/12/10
+tengigabitethernet1/12/10
+    tengigabitethernet1/12/10 is UP RUNNING MULTICAST PROMISC 
+    Dev type is AP
+    MODE is SWITCH
+         MODE is L3
+    MAC address is 4CB9.1131.0100
+    MTU 1500 bytes
+    TCP MSS 0 bytes
+         Vrf ID is 0 
+         Vpn ID is 0 
+    Ifindex is 272728103(10418027) ,refcount 622
+
+A0_8.30(debug)#
+
+
+debug ssp_time_tick end   
+stop tick-timestamp 
+
+clear tick-timestamp
+debug ssp_time_tick clear
+
+
+start tick-timestamp
+debug ssp_time_tick begin 
+
+
+
+手工主备：
+1、备block
+9.54ms      1878.79ms
+10.47ms     3413.38ms
+10.37ms     2050.04ms
+10.3ms      2745.2ms
+10.9ms      4178.81ms
+10.41ms     548.65ms
+10.29ms     514.44ms
+10.22ms     512ms
+9.38ms      3497.67ms
+9.84ms      512.33ms
+
+2、备shutdown
+13289.74ms      514.46ms
+2517.99ms       669.91ms
+5863.72ms       1071.93ms
+7670.17ms       516.56ms
+19764.06ms      515.21ms
+4396.36ms       1315.55ms
+8063.94ms       4089.54ms
+15291.08ms      510.01ms
+8026.93ms       4043.67ms
+21177.17ms      514.54ms
+
+
+
+
+
+####################### VPLS #######################
+仪表        8.30
+3/7 <-----> 1/1/2
+
+8.30           4.36
+1/12/3 <-----> 1/3/22
+
+4.36           仪表
+1/3/23 <-----> 1/13
+
+
+RX10(8.30)
+
+interface tengigabitethernet 1/12/3
+ip address 12.0.1.1 255.255.255.0
+
+
+interface tunnel 1/1/222
+destination 2.2.2.2 
+mpls tunnel-id 222 
+mpls te commit
+exit
+mpls static-lsp ingress 1-2 2.2.2.2 255.255.255.255 nexthop 12.0.1.2 out-label 1234 lsr-id 2.2.2.2 tunnel-id 222
+mpls static-lsp egress 2-1 in-label 2234 lsr-id 2.2.2.2 tunnel-id 222
+mpls vsi aa static
+vsi-id 222
+encapsulation raw
+mpls static-peer 2.2.2.2 in-label 1010 out-label 2010
+exit
+interface gigaethernet 1/1/2
+no portswitch
+mode l2
+mpls l2binding vsi aa
+
+
+
+no mpls vsi aa
+no mpls static-lsp ingress 1-2
+no mpls static-lsp egress 2-1
+no interface tunnel 1/1/222
+interface gigaethernet 1/1/2
+no mpls l2binding vsi aa
+exit
+
+
+
+721-C(4.36)
+
+interface tengigabitethernet 1/3/22
+ip address 12.0.1.2 255.255.255.0
+
+interface tunnel 1/1/222
+destination 1.1.1.1
+mpls tunnel-id 222  
+mpls te commit
+exit
+mpls static-lsp ingress 2-1 1.1.1.1 255.255.255.255 nexthop 12.0.1.1 out-label 2234 lsr-id 1.1.1.1 tunnel-id 222
+mpls static-lsp egress 1-2 in-label 1234 lsr-id 1.1.1.1 tunnel-id 222
+mpls vsi aa static
+vsi-id 222
+encapsulation raw
+mpls static-peer 1.1.1.1 in-label 2010 out-label 1010
+exit
+interface tengigabitethernet 1/3/23
+no portswitch
+mode l2
+mpls l2binding vsi aa
+
+
+mirror-group 1
+interface tengigabitethernet 1/3/23
+mirror-group 1 monitor-port
+interface tengigabitethernet 1/3/22
+mirror-group  1 source-port ingress
+exit
+
+
+
+no mpls vsi aa
+no mpls static-lsp ingress 2-1
+no mpls static-lsp egress 1-2
+no interface tunnel 1/1/222
+interface tengigabitethernet 1/3/23
+no mpls l2binding vsi aa
+exit
+
+
+
+
+
+
+
+
+
+
+####################### VPWS #######################
+仪表        8.30
+3/7 <-----> 1/1/2
+
+8.30           4.36
+1/12/7 <-----> 1/3/22
+
+4.36           4.14
+1/3/23 <-----> 1/5/4
+
+4.14          仪表
+1/5/8 <-----> 1/13 
+
+
+
+RX10(8.30)
+
+interface tunnel 1/1/222
+mpls tunnel-id 222
+destination 2.2.2.2
+mpls te commit 
+exit
+
+mpls bidirectional static-lsp ingress AB lsr-id 2.2.2.2 tunnel-id 222
+forward 2.2.2.2 255.255.255.255 nexthop 20.0.0.2 out-label 20
+backward in-label 20
+exit
+
+interface gigaethernet 1/1/2
+no portswitch
+mode l2
+mpls static-l2vc destination 2.2.2.2 raw vc-id 1 in-label 200 out-label 200
+exit
+
+interface tengigabitethernet 1/12/7
+ip address 20.0.0.1 255.255.255.0
+exit
+
+
+
+
+interface gigaethernet 1/1/2
+no mpls static-l2vc
+portswitch
+exit
+
+no mpls bidirectional ingress AB
+no interface tunnel 1/1/222
+
+
+
+
+
+721-C(4.36)
+
+mpls bidirectional static-lsp transit AB lsr-id 1.1.1.1 2.2.2.2 tunnel-id 222
+forward in-label 20 nexthop 30.0.0.2 out-label 21
+backward in-label 21 nexthop 20.0.0.1 out-label 20 
+exit
+
+interface tengigabitethernet 1/3/22
+ip address 20.0.0.2 255.255.255.0
+interface tengigabitethernet 1/3/23
+ip address 30.0.0.1 255.255.255.0
+exit
+
+
+no mpls bidirectional transit AB
+
+
+
+8800E(4.14)
+
+interface tunnel 1/1/222
+mpls tunnel-id 222
+destination 1.1.1.1
+mpls te commit 
+exit
+
+mpls bidirectional static-lsp egress AB lsr-id 1.1.1.1 tunnel-id 222
+forward in-label 21
+backward 1.1.1.1 255.255.255.255 nexthop 30.0.0.1 out-label 21 
+exit
+
+interface gigaethernet 1/5/4
+ip address 30.0.0.2 255.255.255.0
+
+interface gigaethernet 1/5/8
+no portswitch
+mode l2
+mpls static-l2vc destination 1.1.1.1 raw vc-id 1 in-label 200 out-label 200
+exit
+
+
+interface gigaethernet 1/5/8
+no mpls static-l2vc
+portswitch
+ex
+no mpls bidirectional egress AB
+no interface tunnel 1/1/222
+
+
+
+
+
+
+
+CTC_CLI(ctc-sdk)# Slot 1 bpmode: 1, portmap:
+-----------------------------------------------------
+ Slot| Port|  SnmpPort|   CtcPort|   ifindex
+    1,    1,         1,        89, 272637955(0x10402003)
+    1,    2,         2,        88, 272637959(0x10402007)
+    1,    3,         3,        87, 272637963(0x1040200B)
+    1,    4,         4,        86, 272637967(0x1040200F)
+    1,    5,         5,        85, 272637971(0x10402013)
+    1,    6,         6,        84, 272637975(0x10402017)
+    1,    7,         7,        83, 272637979(0x1040201B)
+    1,    8,         8,        82, 272637983(0x1040201F)
+-----------------------------------------------------
+Slot 2 bpmode: 1, portmap:
+-----------------------------------------------------
+ Slot| Port|  SnmpPort|   CtcPort|   ifindex
+    2,    1,        11,        45, 272646147(0x10404003)
+    2,    2,        12,        44, 272646151(0x10404007)
+    2,    3,        13,        43, 272646155(0x1040400B)
+    2,    4,        14,        42, 272646159(0x1040400F)
+    2,    5,        15,        41, 272646163(0x10404013)
+    2,    6,        16,        40, 272646167(0x10404017)
+    2,    7,        17,        39, 272646171(0x1040401B)
+    2,    8,        18,        38, 272646175(0x1040401F)
+-----------------------------------------------------
+Slot 3 bpmode: 1, portmap:
+-----------------------------------------------------
+ Slot| Port|  SnmpPort|   CtcPort|   ifindex
+    3,    1,        21,        79, 272654339(0x10406003)
+    3,    2,        22,        78, 272654343(0x10406007)
+    3,    3,        23,        77, 272654347(0x1040600B)
+    3,    4,        24,        76, 272654351(0x1040600F)
+    3,    5,        25,        75, 272654355(0x10406013)
+    3,    6,        26,        74, 272654359(0x10406017)
+    3,    7,        27,        73, 272654363(0x1040601B)
+    3,    8,        28,        72, 272654367(0x1040601F)
+-----------------------------------------------------
+Slot 4 bpmode: 1, portmap:
+-----------------------------------------------------
+ Slot| Port|  SnmpPort|   CtcPort|   ifindex
+    4,    1,        31,        35, 272662531(0x10408003)
+    4,    2,        32,        34, 272662535(0x10408007)
+    4,    3,        33,        33, 272662539(0x1040800B)
+    4,    4,        34,        32, 272662543(0x1040800F)
+    4,    5,        35,        31, 272662547(0x10408013)
+    4,    6,        36,        30, 272662551(0x10408017)
+    4,    7,        37,        29, 272662555(0x1040801B)
+    4,    8,        38,        28, 272662559(0x1040801F)
+-----------------------------------------------------
+Slot 5 bpmode: 1, portmap:
+-----------------------------------------------------
+ Slot| Port|  SnmpPort|   CtcPort|   ifindex
+    5,    1,        41,       117, 272670723(0x1040A003)
+    5,    2,        42,       116, 272670727(0x1040A007)
+    5,    3,        43,       115, 272670731(0x1040A00B)
+    5,    4,        44,       114, 272670735(0x1040A00F)
+    5,    5,        45,       113, 272670739(0x1040A013)
+    5,    6,        46,       112, 272670743(0x1040A017)
+    5,    7,        47,       111, 272670747(0x1040A01B)
+    5,    8,        48,       110, 272670751(0x1040A01F)
+-----------------------------------------------------
+Slot 6 bpmode: 22, portmap:
+-----------------------------------------------------
+ Slot| Port|  SnmpPort|   CtcPort|   ifindex
+    6,    1,        51,         0, 272678915(0x1040C003)
+    6,    2,        52,         4, 272678919(0x1040C007)
+    6,    3,        53,         8, 272678923(0x1040C00B)
+    6,    4,        54,         9, 272678927(0x1040C00F)
+    6,    5,        55,        24, 272678931(0x1040C013)
+    6,    6,        56,        25, 272678935(0x1040C017)
+    6,    7,        57,       233, 272678939(0x1040C01B)
+    6,    8,        58,       234, 272678943(0x1040C01F)
+    6,    9,        59,       231, 272678947(0x1040C023)
+    6,   10,        60,       232, 272678951(0x1040C027)
+-----------------------------------------------------
+Slot 7 bpmode: 1, portmap:
+-----------------------------------------------------
+ Slot| Port|  SnmpPort|   CtcPort|   ifindex
+    7,    1,        61,       107, 272687107(0x1040E003)
+    7,    2,        62,       106, 272687111(0x1040E007)
+    7,    3,        63,       105, 272687115(0x1040E00B)
+    7,    4,        64,       104, 272687119(0x1040E00F)
+    7,    5,        65,       103, 272687123(0x1040E013)
+    7,    6,        66,       102, 272687127(0x1040E017)
+    7,    7,        67,       101, 272687131(0x1040E01B)
+    7,    8,        68,       100, 272687135(0x1040E01F)
+-----------------------------------------------------
+Slot 8 bpmode: 22, portmap:
+-----------------------------------------------------
+ Slot| Port|  SnmpPort|   CtcPort|   ifindex
+    8,    1,        71,        10, 272695299(0x10410003)
+    8,    2,        72,        14, 272695303(0x10410007)
+    8,    3,        73,        18, 272695307(0x1041000B)
+    8,    4,        74,        19, 272695311(0x1041000F)
+    8,    5,        75,        52, 272695315(0x10410013)
+    8,    6,        76,        53, 272695319(0x10410017)
+    8,    7,        77,       229, 272695323(0x1041001B)
+    8,    8,        78,       230, 272695327(0x1041001F)
+    8,    9,        79,       227, 272695331(0x10410023)
+    8,   10,        80,       228, 272695335(0x10410027)
+-----------------------------------------------------
+Slot 11 bpmode: 13, portmap:
+-----------------------------------------------------
+ Slot| Port|  SnmpPort|   CtcPort|   ifindex
+   11,    1,        81,       136, 272719875(0x10416003)
+-----------------------------------------------------
+Slot 12 bpmode: 22, portmap:
+-----------------------------------------------------
+ Slot| Port|  SnmpPort|   CtcPort|   ifindex
+   12,    1,        91,        64, 272728067(0x10418003)
+   12,    2,        92,        65, 272728071(0x10418007)
+   12,    3,        93,        66, 272728075(0x1041800B)
+   12,    4,        94,        67, 272728079(0x1041800F)
+   12,    5,        95,        68, 272728083(0x10418013)
+   12,    6,        96,        69, 272728087(0x10418017)
+   12,    7,        97,       225, 272728091(0x1041801B)
+   12,    8,        98,       226, 272728095(0x1041801F)
+   12,    9,        99,       223, 272728099(0x10418023)
+   12,   10,       100,       224, 272728103(0x10418027)
+-----------------------------------------------------
+Slot 13 bpmode: 22, portmap:
+-----------------------------------------------------
+ Slot| Port|  SnmpPort|   CtcPort|   ifindex
+   13,    1,       101,       128, 272736259(0x1041A003)
+   13,    2,       102,       129, 272736263(0x1041A007)
+   13,    3,       103,       130, 272736267(0x1041A00B)
+   13,    4,       104,       131, 272736271(0x1041A00F)
+   13,    5,       105,       132, 272736275(0x1041A013)
+   13,    6,       106,       133, 272736279(0x1041A017)
+   13,    7,       107,       221, 272736283(0x1041A01B)
+   13,    8,       108,       222, 272736287(0x1041A01F)
+   13,    9,       109,       219, 272736291(0x1041A023)
+   13,   10,       110,       220, 272736295(0x1041A027)
+-----------------------------------------------------
+Slot 14 bpmode: 13, portmap:
+-----------------------------------------------------
+ Slot| Port|  SnmpPort|   CtcPort|   ifindex
+   14,    1,       111,        56, 272744451(0x1041C003)
+-----------------------------------------------------
+Slot 15 bpmode: 12, portmap:
+-----------------------------------------------------
+ Slot| Port|  SnmpPort|   CtcPort|   ifindex
+   15,    1,       121,       126, 272752643(0x1041E003)
+   15,    2,       122,       124, 272752647(0x1041E007)
+-----------------------------------------------------
+Slot 16 bpmode: 17, portmap:
+-----------------------------------------------------
+ Slot| Port|  SnmpPort|   CtcPort|   ifindex
+   16,    1,       131,        48, 272760835(0x10420003)
+   16,    2,       132,        49, 272760839(0x10420007)
+   16,    3,       133,        50, 272760843(0x1042000B)
+   16,    4,       134,        51, 272760847(0x1042000F)
+   16,    5,       135,        20, 272760851(0x10420013)
+   16,    6,       136,        21, 272760855(0x10420017)
+   16,    7,       137,        22, 272760859(0x1042001B)
+   16,    8,       138,        23, 272760863(0x1042001F)
+-----------------------------------------------------
+
+
+
+dkit
+show monitor queue-depth
+
+
+sdk
+show qos queue range xx xx (xx表示queue-id)
+
+qos drop port GPORT_ID queue-id QUEUE_ID wtd th 10000 10000 10000
+
+show qos drop port GPORT_ID queue-id QUEUE_ID
+
+show qos stats port GPORT_ID
+
+show qos shape port GPORT_ID
+show qos shape queue port GPORT_ID queue-id QUEUE_ID
+
+show monitor queue-resource ingress port GPORT_ID
+show monitor queue-resource egress port GPORT_ID
+
+
+create vlan 10-14 active 
+
+in te 1/6/1
+portswitch
+lldp disable
+oam disable
+switchport access vlan 10
+
+in te 1/6/2
+portswitch
+lldp disable
+oam disable
+switchport access vlan 10
+
+in te 1/6/3
+portswitch
+lldp disable
+oam disable
+switchport access vlan 11
+
+in te 1/6/4
+portswitch
+lldp disable
+oam disable
+switchport access vlan 11
+
+in te 1/6/5
+portswitch
+lldp disable
+oam disable
+switchport access vlan 12
+
+in te 1/6/6
+portswitch
+lldp disable
+oam disable
+switchport access vlan 12
+
+in te 1/6/7
+portswitch
+lldp disable
+oam disable
+switchport access vlan 13
+
+in te 1/6/8
+portswitch
+lldp disable
+oam disable
+switchport access vlan 13
+
+in te 1/6/9
+portswitch
+lldp disable
+oam disable
+switchport access vlan 14
+
+in te 1/6/10
+portswitch
+lldp disable
+oam disable
+switchport access vlan 14
+
+
+in te 1/16/3
+portswitch
+lldp disable
+oam disable
+switchport access vlan 100
+
+in te 1/16/4
+portswitch
+lldp disable
+oam disable
+switchport access vlan 100
+
+
+
+synce enable
+synce ssm disable
+synce switch-mode revertive wtr-time 0
+synce source interface tengigabitethernet 1/16/4 priority 1
+
+
+
+
+port 0 port-cross-connect nhid 2147483656
+port 4 port-cross-connect nhid 2147483648
+port 8 port-cross-connect nhid 2147483666
+port 9 port-cross-connect nhid 2147483664
+port 24 port-cross-connect nhid 2147483698
+port 25 port-cross-connect nhid 2147483696
+
+
+port 26 port-cross-connect nhid 2147483702
+port 27 port-cross-connect nhid 2147483700
+
+slot 6:
+bpe mux-demux port 26 vlan-base 1004 port-base 233 extender-num 2 disable
+bpe mux-demux port 27 vlan-base 1006 port-base 231 extender-num 2 disable
+
+
+slot 8:
+bpe mux-demux port 54 vlan-base 1012 port-base 238 extender-num 2 disable
+bpe mux-demux port 55 vlan-base 1014 port-base 236 extender-num 2 disable
+
+
+slot 11:
+bpe mux-demux port 142 vlan-base 1016 port-base 234 extender-num 2 disable
+bpe mux-demux port 143 vlan-base 1018 port-base 232 extender-num 2 disable
+
+
+slot 13:
+bpe mux-demux port 134 vlan-base 1024 port-base 221 extender-num 2 disable
+bpe mux-demux port 135 vlan-base 1026 port-base 219 extender-num 2 disable
+
+
+
+
+port 0 port-cross-connect nhid 0xffffffff
+port 4 port-cross-connect nhid 0xffffffff
+port 8 port-cross-connect nhid 0xffffffff
+port 9 port-cross-connect nhid 0xffffffff
+port 24 port-cross-connect nhid 0xffffffff
+port 25 port-cross-connect nhid 0xffffffff
+
+
+port 26 port-cross-connect nhid 0xffffffff
+port 27 port-cross-connect nhid 0xffffffff
+
+
+
+
+chip serdes 1 loopback external enable 
+chip serdes 0 loopback external enable 
+chip serdes 3 loopback external enable 
+chip serdes 2 loopback external enable
+
+chip serdes 9 loopback external enable 
+chip serdes 11 loopback external enable 
+chip serdes 13 loopback external enable 
+chip serdes 15 loopback external enable
+
+
+
+
