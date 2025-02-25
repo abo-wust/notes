@@ -182,7 +182,7 @@ route-target import 1:1
 route-target export 1:1
 exit
 
-interface loopback 2
+interface loopback 20
 ip address 102.102.102.102 255.255.255.255
 exit
 
@@ -247,7 +247,7 @@ no tunnel-prefer segment-routing
 no ipv4 adjacency local-ip-addr 100.1.2.1 remote-ip-addr 100.1.2.2 sid 40002
 exit
 
-no interface loopback 2
+no interface loopback 20
 
 mpls-tp service ma1 level 7
 service cc disable mep 2

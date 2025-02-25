@@ -21,6 +21,7 @@ mpls enable
 ip vrf v1
 rd 1:1
 tunnel-policy sr
+static local-label 106
 route-target import 1:1
 route-target export 1:1
 exit
@@ -109,6 +110,7 @@ exit
 interface loopback 2
 ip address 107.107.107.107 255.255.255.255
 ip router isis 1
+isis prefix-sid index 20
 exit
 
 segment-routing
@@ -165,8 +167,8 @@ mpls enable
 
 ip vrf v1
 rd 1:1
+tunnel-policy sr
 static local-label 102
-tunnel binding destination 106.106.106.106 tunnel 1/1/1
 route-target import 1:1
 route-target export 1:1
 exit
@@ -187,9 +189,10 @@ global-block 11000 12000
 ipv4 adjacency local-ip-addr 100.1.2.1 remote-ip-addr 100.1.2.2 sid 40002
 exit
 
-interface loopback 2
+interface loopback 20
 ip address 102.102.102.102 255.255.255.255
 ip router isis 1
+isis prefix-sid index 30
 exit
 
 interface gigaethernet 1/2/2
@@ -225,7 +228,7 @@ no tunnel-prefer segment-routing
 no ipv4 adjacency local-ip-addr 100.1.2.1 remote-ip-addr 100.1.2.2 sid 40002
 exit
 
-no interface loopback 2
+no interface loopback 20
 
 no tunnel-policy sr
 no router isis 1
