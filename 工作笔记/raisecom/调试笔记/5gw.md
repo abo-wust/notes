@@ -114,6 +114,779 @@
 ## 调试笔记
 
 
+### 5gw 子卡
+
+#### btest 工具
+
+##### yt8531 读写
+
+读写 gphy0 连接的 yt8531 :
+```
+btest mdio1 r 0 0x0
+bsp_mdio1_read unit(0) offset(0x0) value(0x1140)
+
+btest mdio1 w 0 0x0 0x9140
+```
+
+扩展寄存器读写方法：
+```
+# 读 0x27 地址
+btest mdio1 w 0 0x1e 0x27
+btest mdio1 r 0 0x1f
+
+# 给 0x27 地址写 0xAAA
+btest mdio1 w 0 0x1e 0x27
+btest mdio1 w 0 0x1f 0xAAA
+
+```
+
+```
+btest mdio1 w 0 0x1e 0xa001
+btest mdio1 r 0 0x1f
+
+btest mdio1 w 0 0x1e 0xa001
+btest mdio1 w 0 0x1f 0x8147
+```
+
+
+
+##### 环回配置
+
+```
+btest mdio1 w 0 0x1e 0x27
+btest mdio1 w 0 0x1f 
+```
+
+
+##### UTP 收发包计数
+
+打开收发包统计：
+```
+ext reg 0xA0.[15:14]=2’b10
+```
+
+关闭收发包统计：
+```
+ext reg 0xA0.[15:14]=2’b01
+```
+
+先读 0xA0 地址值：
+```
+btest mdio1 w 0 0x1e 0xA0
+btest mdio1 r 0 0x1f
+
+# 读值如下
+bsp_mdio1_read unit(0) offset(0x1f) value(0x68d0)
+```
+
+然后打开收发包统计：
+```
+btest mdio1 w 0 0x1e 0xA0
+btest mdio1 w 0 0x1f 0xA8D0
+```
+
+停止打流，然后关闭收发包统计：
+```
+btest mdio1 w 0 0x1e 0xA0
+btest mdio1 w 0 0x1f 0x68D0
+```
+
+
+从 MDI 收到的正确报文数量（0xA3~0xA8），CRC 错误报文数量（0xA9~0xAC），寄存器读清：
+```
+btest mdio1 w 0 0x1e 0xA3
+btest mdio1 r 0 0x1f
+
+btest mdio1 w 0 0x1e 0xA4
+btest mdio1 r 0 0x1f
+
+btest mdio1 w 0 0x1e 0xA5
+btest mdio1 r 0 0x1f
+
+btest mdio1 w 0 0x1e 0xA6
+btest mdio1 r 0 0x1f
+
+btest mdio1 w 0 0x1e 0xA7
+btest mdio1 r 0 0x1f
+
+btest mdio1 w 0 0x1e 0xA8
+btest mdio1 r 0 0x1f
+
+
+
+
+btest mdio1 w 0 0x1e 0xA9
+btest mdio1 r 0 0x1f
+
+btest mdio1 w 0 0x1e 0xAA
+btest mdio1 r 0 0x1f
+
+btest mdio1 w 0 0x1e 0xAB
+btest mdio1 r 0 0x1f
+
+btest mdio1 w 0 0x1e 0xAC
+btest mdio1 r 0 0x1f
+
+```
+
+从 RGMII 收到的正确报文数量（0xAD~0xB2），CRC 错误报文数量（0xB3~0xB6），寄存器读清：
+```
+btest mdio1 w 0 0x1e 0xAD
+btest mdio1 r 0 0x1f
+
+btest mdio1 w 0 0x1e 0xAE
+btest mdio1 r 0 0x1f
+
+btest mdio1 w 0 0x1e 0xAF
+btest mdio1 r 0 0x1f
+
+btest mdio1 w 0 0x1e 0xB0
+btest mdio1 r 0 0x1f
+
+btest mdio1 w 0 0x1e 0xB1
+btest mdio1 r 0 0x1f
+
+btest mdio1 w 0 0x1e 0xB2
+btest mdio1 r 0 0x1f
+
+
+
+
+btest mdio1 w 0 0x1e 0xB3
+btest mdio1 r 0 0x1f
+
+btest mdio1 w 0 0x1e 0xB4
+btest mdio1 r 0 0x1f
+
+btest mdio1 w 0 0x1e 0xB5
+btest mdio1 r 0 0x1f
+
+btest mdio1 w 0 0x1e 0xB6
+btest mdio1 r 0 0x1f
+```
+
+
+
+
+##### FIBER 收发包计数
+
+打开收发包统计：
+```
+ext reg 0x1A0.[15:14]=2’b10
+```
+
+关闭收发包统计：
+```
+ext reg 0x1A0.[15:14]=2’b01
+```
+
+先读 0xA0 地址值：
+```
+btest mdio1 w 0 0x1e 0x1A0
+btest mdio1 r 0 0x1f
+
+```
+
+然后打开收发包统计：
+```
+btest mdio1 w 0 0x1e 0x1A0
+btest mdio1 w 0 0x1f 0x8000
+```
+
+停止打流，然后关闭收发包统计：
+```
+btest mdio1 w 0 0x1e 0x1A0
+btest mdio1 w 0 0x1f 0x0
+```
+
+
+从 MDI 收到的正确报文数量（0x1A3~0x1A8），CRC 错误报文数量（0x1A9~0x1AC），寄存器读清：
+```
+btest mdio1 w 0 0x1e 0x1A3
+btest mdio1 r 0 0x1f
+
+btest mdio1 w 0 0x1e 0x1A4
+btest mdio1 r 0 0x1f
+
+btest mdio1 w 0 0x1e 0x1A5
+btest mdio1 r 0 0x1f
+
+btest mdio1 w 0 0x1e 0x1A6
+btest mdio1 r 0 0x1f
+
+btest mdio1 w 0 0x1e 0x1A7
+btest mdio1 r 0 0x1f
+
+btest mdio1 w 0 0x1e 0x1A8
+btest mdio1 r 0 0x1f
+
+
+
+
+btest mdio1 w 0 0x1e 0x1A9
+btest mdio1 r 0 0x1f
+
+btest mdio1 w 0 0x1e 0x1AA
+btest mdio1 r 0 0x1f
+
+btest mdio1 w 0 0x1e 0x1AB
+btest mdio1 r 0 0x1f
+
+btest mdio1 w 0 0x1e 0x1AC
+btest mdio1 r 0 0x1f
+
+```
+
+从 RGMII 收到的正确报文数量（0x1AD~0x1B2），CRC 错误报文数量（0x1B3~0x1B6），寄存器读清：
+```
+btest mdio1 w 0 0x1e 0x1AD
+btest mdio1 r 0 0x1f
+
+btest mdio1 w 0 0x1e 0x1AE
+btest mdio1 r 0 0x1f
+
+btest mdio1 w 0 0x1e 0x1AF
+btest mdio1 r 0 0x1f
+
+btest mdio1 w 0 0x1e 0x1B0
+btest mdio1 r 0 0x1f
+
+btest mdio1 w 0 0x1e 0x1B1
+btest mdio1 r 0 0x1f
+
+btest mdio1 w 0 0x1e 0x1B2
+btest mdio1 r 0 0x1f
+
+
+
+
+btest mdio1 w 0 0x1e 0x1B3
+btest mdio1 r 0 0x1f
+
+btest mdio1 w 0 0x1e 0x1B4
+btest mdio1 r 0 0x1f
+
+btest mdio1 w 0 0x1e 0x1B5
+btest mdio1 r 0 0x1f
+
+btest mdio1 w 0 0x1e 0x1B6
+btest mdio1 r 0 0x1f
+```
+
+
+
+
+#### 背板端口验证
+
+- 子卡插在 3 槽（左边槽位）上时，7118 对应 serdes 8、9、10、11；
+- 子卡插在 4 槽（右边槽位）上时，7118 对应 serdes 4、5、6、7；
+
+四个 serdes 模式分别是 SGMII、SGMII、XFI、2.5G，交换芯片的限制是 8 个 serdes 一组时，速率模式不能超过 3 种，分两个小组，4个一组中不能超过 2 种速率。
+
+
+GPHY0-3 --> 0~3
+10GPON--> 7
+PX SDS 就是 port X
+
+LAN 口可以看這個
+```
+diag rt_port get status port all
+```
+
+插拔有 log，可以用 eth0.x 對照
+```
+cat /proc/ni/dev_port_mapping
+
+# cat /proc/ni/dev_port_mapping
+DEV ability:
+ eth0.2
+ eth0.3
+ eth0.4
+ eth0.5
+ eth0.6
+ eth0.7
+ eth0.8
+ nas0
+
+rx: phyPort -> dev[the packet rx from phyPort will send to kernel using dev]
+Root DEV: eth0
+port0 -> eth0.6 , status=1
+port1 -> eth0.3 , status=255
+port2 -> eth0.4 , status=255
+port3 -> eth0.5 , status=255
+port4 -> eth0.7 , status=255
+port5 -> eth0.8 , status=255
+port6 -> eth0.2 , status=255
+port7 -> nas0 , status=255
+
+Root DEV: nas0
+port0 -> eth0.6 , status=1
+port1 -> eth0.3 , status=255
+port2 -> eth0.4 , status=255
+port3 -> eth0.5 , status=255
+port4 -> eth0.7 , status=255
+port5 -> eth0.8 , status=255
+port6 -> eth0.2 , status=255
+port7 -> nas0 , status=255
+
+tx:dev -> txPortMask[when tx from dev, we will use this txPortMask]
+eth0.2 -> port 6
+eth0.3 -> port 0
+eth0.4 -> port 0
+eth0.5 -> port 0
+eth0.6 -> port 0
+eth0.7 -> port 4
+eth0.8 -> port 5
+nas0 -> port 7
+
+=============================================================
+Purpose: Configure NI driver multiple LAN device port mapping
+READ Usage: cat dev_port_mapping
+WRITE Usage: echo [num_of_port dev_name] > dev_port_mapping
+=============================================================
+# 
+```
+
+
+
+接口强制down：
+```
+port set phy-force-power-down port 0 state enable
+```
+
+###### 10GPON
+
+配置命令配置 10GPON 口模式为 XFI：
+```
+rt_ponmisc init
+rt_ponmisc set mode 255 speed 0
+rt_ponmisc set mode 3 speed 4
+```
+
+第二条命令配置后会周期性打印错误，原因是 OMCI 没有关闭，需要修改启动脚本。这条命令是必须的，否则第三条直接配置 xfi 的命令会返回参数invalid，配置前获取 10GPON 口模式：
+```
+RTK.0> rt_ponmisc get mode 
+============================================================
+ PON MODE : XG-PON
+============================================================
+RTK.0> 
+```
+
+配置后获取的接口模式正确：
+```
+RTK.0> rt_ponmisc get mode            
+============================================================
+ PON MODE : XFI : 10G
+============================================================
+RTK.0>
+```
+
+查看接口状态，需要配置10GPON 口模式为 XFI 后才能 show 出接口状态，否则提示非以太口报错：
+```
+# 
+# app-cli 
+                            
+
+       .o88b.  .d88b.  d8888b. d888888b d888888b d8b   db  .d8b.  
+      d8P  Y8 .8P  Y8. 88  `8D `  88  '   `88'   888o  88 d8' `8b 
+      8P      88    88 88oobY'    88       88    88V8o 88 88ooo88 
+      8b      88    88 88`8b      88       88    88 V8o88 88   88 
+      Y8b  d8 `8b  d8' 88 `88.    88      .88.   88  V888 88   88 
+       `Y88P'  `Y88P'  88   YD    YP    Y888888P VP   V8P YP   YP 
+
+
+Cortina>
+Cortina>en
+Cortina>enable 
+Cortina#
+Cortina#config 
+Cortina#aal 
+Cortina(config-aal)#
+Cortina(config-aal)#psds
+Cortina(config-aal-psds)#show eth_link_status 0 
+link_up                       :  0x00000001 
+Cortina(config-aal-psds)#
+```
+
+
+命令行配置模式时，对应的 mode 和 speed 参数参考：
+```
+extern int32
+rt_ponmisc_modeSpeed_get(rt_ponmisc_ponMode_t *pPonMode,rt_ponmisc_ponSpeed_t *pPonSpeed);
+
+typedef enum{
+    RT_GPON_MODE,
+    RT_EPON_MODE,
+    RT_NGPON2_MODE,
+    RT_XFI_MODE,                /* For XFI/10G */
+    RT_FIBER_MODE,              /* For 100BASE-X, 1000BASE-X, 2500BASE-X */
+    RT_SGMII_MODE,              /* For SGMII/1G, HiSGMII/2.5G */
+    RT_USXGMII_MODE,    /* For USXGMII/10G */
+    RT_PONMODE_END,
+}rt_ponmisc_ponMode_t;
+
+typedef enum{
+    RT_100M_SPEED,                      /* Speed: 100Mbps */
+    RT_1G_SPEED,                        /* Speed: 1Gbps */
+    RT_2DOT5G_SPEED,            /* Speed: 2.5Gbps */
+    RT_5G_SPEED,                        /* Speed: 5Gbps */
+	RT_10G_SPEED,                       /* Speed: 10Gbps */
+    RT_10M_SPEED,                       /* Speed: 10Mbps */
+    RT_500M_SPEED,                      /* Speed: 500Mbps */
+    RT_ETHSPEED_END,
+}rt_ponmisc_ethSpeed_t;
+
+```
+
+
+修改启动脚本，避免设置 PON mode，rtk给的XFI範例: 
+	PON_MODE=3
+	PON_SUB_MODE=0
+	PON_SPEED=4
+	啟動文件（modutils.sh/runsdk.sh）會去設定PON mode, 帶起相關的APP
+
+编译文件系统时，会拷贝生成/etc/scripts/modutils.sh，这里面修改ca_rtk_pon_set_mode() 中的 rt_pon_mode 值，系统启动后，10GPON 口模式变成 XFI。
+PON_MODE 的值在这里时是 1，也就是 GPON 模式，这个哪里配置的？可以在 PON_MODE=1 条件下修改 rt_pon_mode = 3，也就是 XFI 模式，pon_speed 在这里时本来已经是 1，也就是 10G-asym，不需要修改。（这个地方修改不是最开始的，因为modutils.sh 里面获取的 PON_MODE 已经是 GPON 模式了，所以需要最原始的模式配置）
+
+```
+# cat /proc/ca_rtk/ponmisc 
+echo init > /proc/ca_rtk/ponmisc : diag rt_ponmisc init
+echo bstPolRvs $state > /proc/ca_rtk/ponmisc : diag rt_ponmisc set burstPolarityReverse state [enable|disable]
+  $state=1 means enable, $state=0 means disable
+echo modSpd $pon_mode $pon_speed > /proc/ca_rtk/ponmisc : diag rt_ponmisc set mode $pon_mode speed $pon_speed
+  $pon_mode=0/1/2/3/4/5/6 means GPON/EPON/NGPON2/XFI/FIBER/SGMII/USXGMII
+  $pon_speed=0/1/2/3/4 means 2.5G/10G-asym/10G-sym/NGPON-asym/NGPON-sym
+```
+
+
+**默认模式的配置有两种方法**
+- 產測時候用 MIB 命令配置，系统已经启动并且跑了软件
+mib set PON_MODE x
+mib commit hs
+
+- preconfig 內的 config_default_hs.xml 裡面修改。這樣改指針對乾淨的 flash 有效。
+
+这个 xml 文件路径在：`os_rtl/sdk/sdk/vendors/Realtek/luna/conf510/9617C_demo_Board-CTC_8832b_8192xb/`，对照下面的数值进行修改：
+```
+PON_MODE配合9607系列做一下同步調整:
+         PON_MODE = 0 <-- None, 用來當作不啟用PON port的設定
+         PON_MODE = 1 <-- GPON type WAN
+         PON_MODE = 2 <-- EPON type WAN
+         PON_MODE = 3 <-- Ether type WAN
+EPON/GPON type WAN的speed:
+           PON_SPEED = 0 <-- EPON/GPON
+           PON_SPEED = 1 <-- 下行10G, 非對稱(XGPON, 10G/1G EPON)
+           PON_SPEED = 2 <-- 上下行皆10G (XGSPON, 10G/10G EPON)
+針對Ether type WAN新增加PON_SUB_MODE來識別, 後續針對NG-PON2亦可用來作為GPON mode的擴增:
+           PON_SUB_MODE = 0 <-- XFI mode, 目前只有10G, (traditional GPON modes)
+           PON_SUB_MODE = 1 <-- FIBER mode, for 100BASE-X, 1000BASE-X, 2500BASE-X, (NG-PON2)
+           PON_SUB_MODE = 2 <-- SGMII mode, for SGMII/1G/100M/10M, HiSGMII/2.5G
+           PON_SUB_MODE = 3 <-- USXGMII mode, 10G/5G/2.5G/1G/100M/10M
+Ether type WAN的speed:
+           PON_SPEED = 0  <-- 100M
+           PON_SPEED = 1  <-- 1G
+           PON_SPEED = 2  <-- 2.5G
+           PON_SPEED = 3  <-- 5G
+           PON_SPEED = 4  <-- 10G
+           PON_SPEED = 5  <-- 10M
+
+```
+
+
+
+
+###### GPHY0~1
+
+gphy0 接 yt8531，7118 侧三槽插子卡时，对应 ctcport 24，需要配置为 sgmii 自协商模式，gphy0 配置自协商。通过 mdio1 读写 phy 寄存器，对应unit=0：
+```
+btest mdio1 r 0 0x0
+btest mdio1 r 0 0x1
+```
+
+启动脚本里面对 phy 0x6 进行复位，但是起来后 mdio1 读不到，手动复位后正常：
+```
+btest gpio w 15 0
+btest gpio w 15 1
+```
+
+
+gphy1 接yt8211，7118 侧三槽插子卡时，对应 ctcport 25，需要配置为 sgmii 自协商模式，gphy1 配置自协商。通过 mdio1 读写 phy 寄存器，对应unit=1：
+```
+btest mdio1 r 1 0x0
+btest mdio1 r 1 0x1
+```
+
+测试板卡上gphy1 没有接到 8211，而是直出的 RJ45 网口用来调试。
+
+
+配置端口 7 收包直接从 port0 转发：
+```
+rt_cls clear ext-rule
+rt_cls set ext-rule filter igrPort data 7 mask 0x3f
+rt_cls set ext-rule action fwd ldpid 0
+rt_cls add ext-rule index 0
+```
+
+如果要配置反向转发，增加另一个index：
+```
+rt_cls clear ext-rule
+rt_cls set ext-rule filter igrPort data 0 mask 0x3f
+rt_cls set ext-rule action fwd ldpid 7
+rt_cls add ext-rule index 10
+```
+
+
+
+
+
+rt_port get unitype port all
+rt_l2-table get limit-learning port all count
+l2-table get lookup-miss port all unicast action
+
+
+
+
+###### P6 SDS
+
+支持 1G（SGMII） 和 2.5G（HSGMII） 两种速率，ctc7118 侧查看 serdes 8、9、10、11 对应端口 24、25、26、27；serdes 4、5、6、7 对应端口 8、9、10、11。配置 port 27 为 2.5G 模式：
+```
+port 27 if-mode 2500 2500X
+port 27 port-en enable
+port 27 mac enable
+```
+
+rtl9617 侧找到 P6 SDS 对应的端口 6，配置 hsgmii 模式：
+```
+port set serdes port 6 hsgmii-mac n-way auto
+或者强制
+port set serdes port 6 hsgmii-mac n-way force
+```
+
+然后查看两侧端口 link 状态，rtl9617 查看端口 P6 状态：
+```
+RTK.0> port get status port 6
+Port Status Speed    Duplex TX_FC RX_FC
+---- ------ -----    ------ ----- -----
+6    Up     2.5G     Full   Dis   Dis  
+```
+
+ctc7118 侧查看 port 27 状态：
+```
+CTC_CLI(ctc-sdk)# show port mac-link 
+ ----------------------------------------------------------------------------------------------------
+ GPort   LPort MAC   Link   MAC-EN   Speed  Fec     Duplex  Auto-Neg  Interface     Rx-Rate   Tx-Rate
+ ----------------------------------------------------------------------------------------------------
+ 0x0000  0     0     down   TRUE     1G     -      FD      TRUE      QSGMII         0 bps     0 bps   
+ 0x0001  1     1     down   TRUE     1G     -      FD      TRUE      QSGMII         0 bps     0 bps   
+ 0x0002  2     2     down   TRUE     1G     -      FD      TRUE      QSGMII         0 bps     0 bps   
+ 0x0003  3     3     down   TRUE     1G     -      FD      TRUE      QSGMII         0 bps     0 bps   
+ 0x0004  4     4     up     TRUE     1G     -      FD      TRUE      QSGMII         0 bps     0 bps   
+ 0x0005  5     5     up     TRUE     1G     -      FD      TRUE      QSGMII         0 bps     0 bps   
+ 0x0006  6     6     up     TRUE     1G     -      FD      TRUE      QSGMII         0 bps     0 bps   
+ 0x0007  7     7     up     TRUE     1G     -      FD      TRUE      QSGMII         0 bps     0 bps   
+ 0x0008  8     8     up     TRUE     10G    None   FD      FALSE     XFI            0 bps     0 bps   
+ 0x0009  9     9     up     TRUE     10G    None   FD      FALSE     XFI            0 bps     0 bps   
+ 0x000A  10    10    down   TRUE     10G    None   FD      FALSE     XFI            0 bps     0 bps   
+ 0x000B  11    11    down   TRUE     10G    None   FD      FALSE     XFI            0 bps     0 bps   
+ 0x000C  12    12    up     TRUE     10G    None   FD      FALSE     XFI            0 bps     0 bps   
+ 0x000D  13    13    up     TRUE     10G    None   FD      FALSE     XFI            0 bps     0 bps   
+ 0x000E  14    14    down   TRUE     10G    None   FD      FALSE     XFI            0 bps     0 bps   
+ 0x000F  15    15    down   TRUE     10G    None   FD      FALSE     XFI            0 bps     0 bps   
+ 0x0010  16    16    up     TRUE     1G     -      FD      TRUE      QSGMII         0 bps     0 bps   
+ 0x0011  17    17    up     TRUE     1G     -      FD      TRUE      QSGMII         0 bps     0 bps   
+ 0x0012  18    18    up     TRUE     1G     -      FD      TRUE      QSGMII         0 bps     0 bps   
+ 0x0013  19    19    up     TRUE     1G     -      FD      TRUE      QSGMII         0 bps     0 bps   
+ 0x0014  20    20    up     TRUE     1G     -      FD      TRUE      QSGMII         0 bps     0 bps   
+ 0x0015  21    21    up     TRUE     1G     -      FD      TRUE      QSGMII         0 bps     0 bps   
+ 0x0016  22    22    up     TRUE     1G     -      FD      TRUE      QSGMII         0 bps     0 bps   
+ 0x0017  23    23    up     TRUE     1G     -      FD      TRUE      QSGMII         0 bps     0 bps   
+ 0x0018  24    24    down   FALSE    10G    None   FD      FALSE     XFI            0 bps     0 bps   
+ 0x0019  25    25    down   FALSE    10G    None   FD      FALSE     XFI            0 bps     0 bps   
+ 0x001A  26    26    down   TRUE     10G    None   FD      FALSE     XFI            0 bps     0 bps   
+ 0x001B  27    27    up     TRUE     2.5G   -      FD      TRUE      2500X          0 bps     0 bps   
+ 0x003C  60    60    down   TRUE     10G    None   FD      FALSE     XFI            0 bps     0 bps   
+ 0x003D  61    61    down   TRUE     10G    None   FD      FALSE     XFI            0 bps     0 bps   
+ ----------------------------------------------------------------------------------------------------
+
+```
+
+
+
+##### 收发包统计
+
+查看指定端口的所有收发包统计：
+```
+RTK.0> mib dump counter port 6 
+Port: 6
+ifInOctets                         :                   2427178
+ifInUcastPkts                      :                     28223
+ifInMulticastPkts                  :                         0
+ifInBroadcastPkts                  :                         0
+ifInDiscards                       :                         0
+ifOutOctets                        :                         0
+ifOutDiscards                      :                         0
+ifOutUcastPkts                     :                         0
+ifOutMulticastPkts                 :                         0
+ifOutBroadcastPkts                 :                         0
+dot1dPortDelayExceedDiscards       :                         0
+......
+RTK.0>
+```
+
+
+只查看指定接口的收包或者发包计数：
+```
+RTK.0> mib dump counter port 6 ifInUcastPkts
+Port: 6
+ifInUcastPkts: 49266
+RTK.0> 
+RTK.0> 
+RTK.0> mib dump counter port 7 ifOutUcastPkts
+Port: 6
+ifOutUcastPkts: 0
+```
+
+
+##### 透传配置（指定端口到端口）
+
+配置端口 7 收包直接从端口 6 转发：
+```
+rt_cls clear ext-rule
+rt_cls set ext-rule filter igrPort data 7 mask 0x3f
+rt_cls set ext-rule action fwd ldpid 6
+rt_cls add ext-rule index 0
+```
+
+如果要配置反向转发，增加另一个index：
+```
+rt_cls clear ext-rule
+rt_cls set ext-rule filter igrPort data 6 mask 0x3f
+rt_cls set ext-rule action fwd ldpid 7
+rt_cls add ext-rule index 10
+```
+
+
+需要注意系统启动已经配置的规则，避免 index 冲突，查看已有规则：
+```
+rt_cls get ext-rule index valid
+```
+
+删除规则：
+```
+rt_cls delete ext-rule index 1
+rt_cls delete ext-rule index 2
+rt_cls delete ext-rule index 3
+rt_cls delete ext-rule index 4
+```
+
+
+另外，还需要关掉未知单播的限速，否则超过 1.5M 会有丢包：
+```
+rt_rate set storm-control unknown-unicast port all state disable
+```
+
+
+只配置指定端口转发会出现256字节几分钟丢一个包，其他字节长度报文开始就丢将近50%包，配置下面两个设置：
+```
+l2-table set limit-learning port 6 count 2000
+l2-table set limit-learning port 7 count 2000
+
+app-cli
+enable
+config
+aal
+fdb
+ctrl 0 lrn_mode 0
+```
+
+或者配置下面两个命令：（跟上面类似，解决mac漂移导致的丢包）
+```
+app-cli
+enable
+config
+aal
+fdb
+lrn_fwd_ctrl 0 sm_tmp_entry_fwd 1
+lrn_fwd_ctrl 0 sm_sm_entry_fwd 1
+```
+
+
+
+
+##### 调试命令
+
+1、查看丢包，这个命令是读清的，在确定有丢包时，重复打流前先 cat 清空计数，打流后再 cat 看结果：
+```
+cat /proc/fc/hw_dump/dropcount
+```
+
+
+2、设置 mac 学习limit：
+```
+l2-table set limit-learning port 6 count 2000
+```
+
+
+
+##### 打流验证
+
+![](Pasted%20image%2020250717185559.png)
+
+9617 配置
+```
+port set serdes port 6 hsgmii-mac n-way auto
+
+rt_ponmisc init
+rt_ponmisc set mode 255 speed 0
+rt_ponmisc set mode 3 speed 4
+
+rt_cls clear ext-rule
+rt_cls set ext-rule filter igrPort data 7 mask 0x3f
+rt_cls set ext-rule action fwd ldpid 6
+rt_cls add ext-rule index 0
+
+rt_cls set ext-rule filter igrPort data 6 mask 0x3f
+rt_cls set ext-rule action fwd ldpid 7
+rt_cls add ext-rule index 10
+
+rt_rate set storm-control unknown-unicast port all state disable
+
+app-cli
+enable
+config
+aal
+fdb
+lrn_fwd_ctrl 0 sm_tmp_entry_fwd 1
+lrn_fwd_ctrl 0 sm_sm_entry_fwd 1
+
+```
+
+
+7118 配置：
+```
+port 27 if-mode 2500 2500X
+port 27 port-en enable
+port 27 mac enable
+
+port 26 port-en enable
+
+vlan add port 27 vlan 10
+
+show nexthop brguc port 61
+Gport:0x003d L2Uc Nexthop Id:2147483770
+
+show nexthop brguc port 26
+Gport:0x001a L2Uc Nexthop Id:2147483700
+
+port 61 port-cross-connect nhid 2147483700
+port 26 port-cross-connect nhid 2147483770
+
+```
+
+
+
+
+
 ### 5G 模块
 
 #### 模块上电
