@@ -116,6 +116,174 @@
 
 ### 5gw 子卡
 
+
+#### 驱动适配
+
+1、初始化
+先查询模块信息，判断模块正常上电
+查询 sim 卡信息，正常后配置 sim 卡相关默认配置（目前就是 apn），板卡上线后具体的 apn 由主控下发保存的配置
+使能后路由
+使能 ippass
+开启 arp 代理
+锁定入网模式为 5g
+自动拨号，这个需要主控下发正确的 apn 后执行
+
+2、at 指令的配置和返回信息处理
+at 指令下发参考终端代码封装一个公共接口
+at 指令下发后需要获取模组返回的信息，看是否正确配置，这需要解析返回的内容
+at 指令下发的冲突检测，应该是一次下发一个 at 指令，在上一个 at 指令没有返回时，后续的 at 指令执行等待，或者是都下发，但是需要检测每个指令的返回值
+
+
+
+
+#### 擦除 flash
+
+```
+setenv mtdparts mtdparts=ca_spinand_flash:2816K(boot),256K@0x340000(env),256K@0x380000(env2),256K@0x3c0000(static_conf),245760K@0x400000(ubi_device)
+setenv bootargs ubi.mtd=4 earlycon=serial,0xf43291b0 console=ttyS0,9600 swiotlb=noforce mtdparts=ca_spinand_flash:2816K(boot),256K@0x340000(env),256K@0x380000(env2),256K@0x3c0000(static_conf),245760K@0x400000(ubi_device)
+saveenv
+saveenv 
+nand erase.part ubi_device 
+执行完后重新设备
+ubi part ubi_device 
+ubi create ubi_Config  0xa00000 dynamic
+ubi create ubi_k0  0x5a00000 dynamic
+ubi create ubi_k1 0x5a00000 dynamic
+ubi create ubi_user 0x1400000 dynamic
+```
+
+##### 1、解除ubi设备和mtd分区绑定：
+
+ubi detach -m <mtd_device_number> // 如 ubi detach -m 5 或 ubi detach ubi_device
+```
+# ubi detach ubi_device
+ubi0: detaching mtd5
+ubi0: mtd5 is detached
+# 
+```
+
+##### 2、擦除mtd分区
+
+`nand erase.part <partition_name>`
+
+```
+# nand erase.part ubi_device
+
+NAND erase.part: device 0 offset 0x400000, size 0x1f000000
+Erasing at 0x1f3c0000 -- 100% complete.
+OK
+#
+```
+
+##### 3、创建ubi设备
+
+`ubi part <partition_name>`
+
+```
+# ubi part ubi_device
+ubi0: default fastmap pool size: 95
+ubi0: default fastmap WL pool size: 47
+ubi0: attaching mtd5
+ubi0: scanning is finished
+ubi0: empty MTD device detected
+ubi0: attached mtd5 (name "ubi_device", size 496 MiB)
+ubi0: PEB size: 262144 bytes (256 KiB), LEB size: 253952 bytes
+ubi0: min./max. I/O unit sizes: 4096/4096, sub-page size 4096
+ubi0: VID header offset: 4096 (aligned 4096), data offset: 8192
+ubi0: good PEBs: 1984, bad PEBs: 0, corrupted PEBs: 0
+ubi0: user volume: 0, internal volumes: 1, max. volumes count: 128
+ubi0: max/mean erase counter: 0/0, WL threshold: 4096, image sequence number: 0
+ubi0: available PEBs: 1938, total reserved PEBs: 46, PEBs reserved for bad PEB handling: 40
+# 
+```
+
+##### 4、创建ubi卷
+`ubi create <volume_name> <size> <-> `
+
+```
+# ubi create ubi_Config  0x3200000 dynamic
+Creating dynamic volume ubi_Config of size 52428800
+
+# ubi create ubi_k0  0x9600000 dynamic
+Creating dynamic volume ubi_k0 of size 157286400
+# 
+
+# ubi create ubi_k1 0x9600000 dynamic
+Creating dynamic volume ubi_k1 of size 157286400
+# 
+
+# ubi create ubi_user 0x6400000 dynamic
+Creating dynamic volume ubi_user of size 104857600
+# 
+```
+
+
+**异常情况需要看一下是不是5和6 的问题**
+##### 5、关于 ubi part ubi_device 报错
+
+```
+# ubi part ubi_device       
+ubi0: default fastmap pool size: 100
+ubi0: default fastmap WL pool size: 50
+ubi0: attaching mtd5
+ubi0: scanning is finished
+ubi0 error: ubi_read_volume_table: the layout volume was not found
+ubi0 error: ubi_attach_mtd_dev: failed to attach mtd5, error -22
+UBI error: cannot attach mtd5
+UBI error: cannot initialize UBI, error -22
+UBI init error 22
+Please check, if the correct MTD partition is used (size big enough?)
+
+需要做以下修改：
+修改前：
+bootargs=earlycon=serial,0xf43291b0 ubi.mtd=4 console=ttyS0,9600 swiotlb=noforce mtdparts=ca_spinand_flash:2816K(boot),256K@0x340000(env),256K@0x380000(env2),256K@0x3c0000(static_conf),-(ubi_device)
+mtdparts=mtdparts=ca_spinand_flash:2816K(boot),256K@0x340000(env),256K@0x380000(env2),256K@0x3c0000(static_conf),-(ubi_device)
+
+修改后：
+setenv mtdparts mtdparts=ca_spinand_flash:2816K(boot),256K@0x340000(env),256K@0x380000(env2),256K@0x3c0000(static_conf),507904K@0x400000(ubi_device)
+setenv bootargs ubi.mtd=4 earlycon=serial,0xf43291b0 console=ttyS0,9600 swiotlb=noforce mtdparts=ca_spinand_flash:2816K(boot),256K@0x340000(env),256K@0x380000(env2),256K@0x3c0000(static_conf),507904K@0x400000(ubi_device)
+```
+
+ubi part ubi_device执行结果：
+```
+# ubi part ubi_device
+ubi0: default fastmap pool size: 95
+ubi0: default fastmap WL pool size: 47
+ubi0: attaching mtd5
+ubi0: scanning is finished
+ubi0: empty MTD device detected
+ubi0: attached mtd5 (name "ubi_device", size 496 MiB)
+ubi0: PEB size: 262144 bytes (256 KiB), LEB size: 253952 bytes
+ubi0: min./max. I/O unit sizes: 4096/4096, sub-page size 4096
+ubi0: VID header offset: 4096 (aligned 4096), data offset: 8192
+ubi0: good PEBs: 1984, bad PEBs: 0, corrupted PEBs: 0
+ubi0: user volume: 0, internal volumes: 1, max. volumes count: 128
+ubi0: max/mean erase counter: 0/0, WL threshold: 4096, image sequence number: 0
+ubi0: available PEBs: 1938, total reserved PEBs: 46, PEBs reserved for bad PEB handling: 40
+
+```
+##### 6、移除ubi卷
+1）创建ubi卷
+```
+# ubi create ubi_Config  0xa00000 dynamic
+Creating dynamic volume ubi_Config of size 10485760
+```
+2）创建错了，移除卷
+```
+# ubi remove ubi_Config
+Remove UBI volume ubi_Config (id 0)
+#
+``` 
+3）重新创建ubi卷
+
+
+
+##### 7、查看ubi设备信息
+`ubi info`
+##### 8、查看ubi卷布局
+`ubi info l`
+
+
 #### btest 工具
 
 ##### yt8531 读写
@@ -378,7 +546,7 @@ btest mdio1 r 0 0x1f
 
 #### 背板端口验证
 
-- 子卡插在 3 槽（左边槽位）上时，7118 对应 serdes 8、9、10、11；
+- 子卡插在 3 槽（左边槽位）上时，7118 对应 serdes 8、9、10、11，gport 分别是24、25、26、27，硬件连接对应的 RTL9617 分别是GPHY1、GPHY0、10GPON、P6 SDS；
 - 子卡插在 4 槽（右边槽位）上时，7118 对应 serdes 4、5、6、7；
 
 四个 serdes 模式分别是 SGMII、SGMII、XFI、2.5G，交换芯片的限制是 8 个 serdes 一组时，速率模式不能超过 3 种，分两个小组，4个一组中不能超过 2 种速率。
@@ -560,11 +728,13 @@ echo modSpd $pon_mode $pon_speed > /proc/ca_rtk/ponmisc : diag rt_ponmisc set mo
 
 
 **默认模式的配置有两种方法**
-- 產測時候用 MIB 命令配置，系统已经启动并且跑了软件
-mib set PON_MODE x
+（1）產測時候用 MIB 命令配置，系统已经启动并且跑了软件
+```
+mib set PON_MODE 3
 mib commit hs
+```
 
-- preconfig 內的 config_default_hs.xml 裡面修改。這樣改指針對乾淨的 flash 有效。
+（2）preconfig 內的 config_default_hs.xml 裡面修改。這樣改指針對乾淨的 flash 有效。
 
 这个 xml 文件路径在：`os_rtl/sdk/sdk/vendors/Realtek/luna/conf510/9617C_demo_Board-CTC_8832b_8192xb/`，对照下面的数值进行修改：
 ```
@@ -593,6 +763,7 @@ Ether type WAN的speed:
 ```
 
 
+> 修改 config_default_hs.xml 后，擦掉 flash，重新升级 system 版本，起来后配置 `mib set PON_MODE 3` 和 `mib commit hs`，然后重启，再看板卡启动后就没有打印刷屏了。
 
 
 ###### GPHY0~1
@@ -660,6 +831,9 @@ rtl9617 侧找到 P6 SDS 对应的端口 6，配置 hsgmii 模式：
 port set serdes port 6 hsgmii-mac n-way auto
 或者强制
 port set serdes port 6 hsgmii-mac n-way force
+
+# 设置千兆sgmii模式
+port set serdes port 6 sgmii-mac n-way force
 ```
 
 然后查看两侧端口 link 状态，rtl9617 查看端口 P6 状态：
@@ -711,6 +885,15 @@ CTC_CLI(ctc-sdk)# show port mac-link
 ```
 
 
+
+```
+ca_event_port_link_t link_event;
+/* Send port link change event */
+    memset(&link_event, 0, sizeof(ca_event_port_link_t));
+    link_event.port_id = port;
+    link_event.status  = status.link_up ? CA_PORT_LINK_UP : CA_PORT_LINK_DOWN ;
+    ca_event_send(0, CA_EVENT_ETH_PORT_LINK, (void *)&link_event, sizeof(ca_event_port_link_t));
+```
 
 ##### 收发包统计
 
@@ -777,6 +960,8 @@ rt_cls delete ext-rule index 1
 rt_cls delete ext-rule index 2
 rt_cls delete ext-rule index 3
 rt_cls delete ext-rule index 4
+rt_cls delete ext-rule index 510
+rt_cls delete ext-rule index 511
 ```
 
 
@@ -884,6 +1069,647 @@ port 26 port-cross-connect nhid 2147483770
 ```
 
 
+#### IBC 验证
+
+先确认背板硬件连接关系：
+- 子卡插在 3 槽（左边槽位）上时，7118 对应 serdes 8、9、10、11，gport 分别是24、25、26、27，硬件连接对应的 RTL9617 分别是GPHY1、GPHY0、10GPON、P6 SDS；
+- 子卡插在 4 槽（右边槽位）上时，7118 对应 serdes 4、5、6、7；
+```
+# 7118 侧三个接口都配置sgmii模式
+port 24 if-mode 1G SGMII
+port 24 port-en enable
+port 24 mac enable
+
+port 25 if-mode 1G SGMII
+port 25 port-en enable
+port 25 mac enable
+
+port 27 if-mode 1G SGMII
+port 27 port-en enable
+port 27 mac enable
+
+
+```
+
+4xg上已经配置了 snmp 口通过 knet 上 cpu，ibc 需要配置另外一个交换口通过 knet 上 cpu，ibc 通信使用 port 25 与 RTL9617 GPHY0 连接的通道：
+```
+packet netif create eth-ibc port 25 000e.5e00.0011
+
+qos cpu-reason 601 map-to queue-id 2 reason-group 15
+qos cpu-reason 601 dest-to local-cpu
+
+nexthop add misc cpu-reason 0x5402 reason-id 601
+
+port 25 port-cross-connect nhid 0x5402
+
+
+# 配置网口 ibc0
+vconfig add eth-ibc 1026
+ip link set eth-ibc.1026 down
+ip link set eth-ibc.1026 name ibc0
+ip link set ibc0 up
+
+```
+
+RTL9617 上删除规则：
+```
+rt_cls delete ext-rule index 1
+rt_cls delete ext-rule index 2
+rt_cls delete ext-rule index 3
+rt_cls delete ext-rule index 4
+rt_cls delete ext-rule index 510
+rt_cls delete ext-rule index 511
+```
+
+##### 验证硬件通道数据收发
+
+1、验证从 RTL9617 的 GPHY0 出去的报文是否能通过 7118 的 port 25 从 knet 上送 7118 的 cpu，报文流向，7118 port27 -> 9617 P6 SDS -> 9617 GPHY0 -> 7118 port25 -> 7118 cpu （上面创建的网口eth-ibc）
+
+配置端口 6 收包直接从端口 0 转发出去：
+```
+rt_cls clear ext-rule
+rt_cls set ext-rule filter igrPort data 6 mask 0x3f
+rt_cls set ext-rule action fwd ldpid 0
+rt_cls add ext-rule index 0
+```
+
+另外，还需要关掉未知单播的限速，否则超过 1.5M 会有丢包：
+```
+rt_rate set storm-control unknown-unicast port all state disable
+```
+
+2、验证 RTL9617 GPHY0 收到的报文是否能正常上送 9617 的 cpu：
+
+通过下面的命令查看 GPHY0 对应的网口是 eth 0.6：
+```
+cat /proc/ni/dev_port_mapping
+```
+
+报文流向：7118 port25 -> 9617 GPHY0 -> 9617 cpu（ifconfig eth0.6查看收发计数）
+
+
+##### tipc 配置
+
+主控上需要注意tipc 的配置要在创建 netif 口，配置好 ibc0 网口之后。
+
+RTL9617 上需要删除默认的 cls 规则，不然 tipc 报文到 GPHY0 口后由于没有 hit 上 cls 规则走默认的丢弃规则 cls 511
+```
+[2025-09-10 14:25:07] RTK.0>
+[2025-09-10 14:25:07] RTK.0>rt_cls get ext-rule index valid
+[2025-09-10 14:25:07] ***************************************
+[2025-09-10 14:25:07] Index: 1
+[2025-09-10 14:25:07] Valid: 1
+[2025-09-10 14:25:07] Filter:
+[2025-09-10 14:25:07]     Direction: Upstream
+[2025-09-10 14:25:07]     Egress Port: (0,0x3f)
+[2025-09-10 14:25:07] Action:
+[2025-09-10 14:25:08]     Stag Action: Transparent
+[2025-09-10 14:25:08]     Ctag Action: Transparent
+[2025-09-10 14:25:08]     Flow ID action  : Nop
+[2025-09-10 14:25:08]     Group ID action : Nop
+[2025-09-10 14:25:08]     Forward action  : Nop
+[2025-09-10 14:25:08]     COS action      : Nop
+[2025-09-10 14:25:08] ***************************************
+[2025-09-10 14:25:08] Index: 2
+[2025-09-10 14:25:08] Valid: 1
+[2025-09-10 14:25:08] Filter:
+[2025-09-10 14:25:08]     Direction: Upstream
+[2025-09-10 14:25:08]     Egress Port: (1,0x3f)
+[2025-09-10 14:25:08] Action:
+[2025-09-10 14:25:08]     Stag Action: Transparent
+[2025-09-10 14:25:08]     Ctag Action: Transparent
+[2025-09-10 14:25:08]     Flow ID action  : Nop
+[2025-09-10 14:25:08]     Group ID action : Nop
+[2025-09-10 14:25:08]     Forward action  : Nop
+[2025-09-10 14:25:08]     COS action      : Nop
+[2025-09-10 14:25:08] ***************************************
+[2025-09-10 14:25:08] Index: 3
+[2025-09-10 14:25:08] Valid: 1
+[2025-09-10 14:25:08] Filter:
+[2025-09-10 14:25:08]     Direction: Upstream
+[2025-09-10 14:25:08]     Egress Port: (2,0x3f)
+[2025-09-10 14:25:08] Action:
+[2025-09-10 14:25:08]     Stag Action: Transparent
+[2025-09-10 14:25:08]     Ctag Action: Transparent
+[2025-09-10 14:25:08]     Flow ID action  : Nop
+[2025-09-10 14:25:08]     Group ID action : Nop
+[2025-09-10 14:25:08]     Forward action  : Nop
+[2025-09-10 14:25:08]     COS action      : Nop
+[2025-09-10 14:25:08] ***************************************
+[2025-09-10 14:25:08] Index: 4
+[2025-09-10 14:25:08] Valid: 1
+[2025-09-10 14:25:08] Filter:
+[2025-09-10 14:25:08]     Direction: Upstream
+[2025-09-10 14:25:08]     Egress Port: (3,0x3f)
+[2025-09-10 14:25:08] Action:
+[2025-09-10 14:25:08]     Stag Action: Transparent
+[2025-09-10 14:25:09]     Ctag Action: Transparent
+[2025-09-10 14:25:09]     Flow ID action  : Nop
+[2025-09-10 14:25:09]     Group ID action : Nop
+[2025-09-10 14:25:09]     Forward action  : Nop
+[2025-09-10 14:25:09]     COS action      : Nop
+[2025-09-10 14:25:09] ***************************************
+[2025-09-10 14:25:09] Index: 510
+[2025-09-10 14:25:09] Valid: 1
+[2025-09-10 14:25:09] Filter:
+[2025-09-10 14:25:09]     Direction: Upstream
+[2025-09-10 14:25:09]     Packet Type: Unknown Unicast
+[2025-09-10 14:25:09] Action:
+[2025-09-10 14:25:09]     Stag Action: Transparent
+[2025-09-10 14:25:09]     Ctag Action: Transparent
+[2025-09-10 14:25:09]     Flow ID action  : Nop
+[2025-09-10 14:25:09]     Group ID action : Nop
+[2025-09-10 14:25:09]     Forward action  : MCGID 0x1
+[2025-09-10 14:25:09]     COS action      : Nop
+[2025-09-10 14:25:09] ***************************************
+[2025-09-10 14:25:09] Index: 511
+[2025-09-10 14:25:09] Valid: 1
+[2025-09-10 14:25:09] Filter:
+[2025-09-10 14:25:09] Action:
+[2025-09-10 14:25:09]     Stag Action: Transparent
+[2025-09-10 14:25:09]     Ctag Action: Transparent
+[2025-09-10 14:25:09]     Flow ID action  : Nop
+[2025-09-10 14:25:09]     Group ID action : Nop
+[2025-09-10 14:25:09]     Forward action  : Drop 0x0
+[2025-09-10 14:25:09]     COS action      : Nop
+[2025-09-10 14:25:10] RTK.0>
+[2025-09-10 14:25:10] RTK.0>
+```
+
+
+##### 使用 P6 SDS 口作为管理口时 ibc 不通
+
+网卡 ibc0 是在网卡 eth0.2 上创建的子接口，通过ifconfig 查看网卡都是正常 up，但是实际使用时无法正常收发报文。这个时候就需要使用 `ip -d link show`命令查看详细的网卡状态信息：
+```
+# 
+# ip -d link show eth0.2
+7: eth0.2: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc pfifo_fast state DOWN mode DEFAULT group default qlen 1000
+    link/ether 00:0e:5e:62:ee:ee brd ff:ff:ff:ff:ff:ff permaddr 00:00:01:00:02:00 promiscuity 1 minmtu 60 maxmtu 9022 addrgenmode eui64 numtxqueues 1 numrxqueues 1 gso_max_size 65536 gso_max_segs 65535 
+# 
+# ip -d link show ibc0
+18: ibc0@eth0.2: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc noqueue state LOWERLAYERDOWN mode DEFAULT group default qlen 1000
+    link/ether 20:20:02:25:15:03 brd ff:ff:ff:ff:ff:ff promiscuity 0 minmtu 0 maxmtu 65535 
+    vlan protocol 802.1Q id 1026 <REORDER_HDR> addrgenmode eui64 numtxqueues 1 numrxqueues 1 gso_max_size 65536 gso_max_segs 65535
+```
+
+可以看到子接口 ibc0 和父接口 eth0.2 的状态都有问题，NO-CARRIER 表示物理链路有问题。最后定位是 P6 SDS 这个口没有通知 nic driver carrier on，需要在接口 link 时通知：
+```
+ca_event_port_link_t link_event;
+/* Send port link change event */
+memset(&link_event, 0, sizeof(ca_event_port_link_t));
+link_event.port_id = CA_PORT_ID(CA_PORT_TYPE_ETHERNET, 6);
+link_event.status  = 1;//status.link_up ? CA_PORT_LINK_UP : CA_PORT_LINK_DOWN ;
+ca_event_send(0, CA_EVENT_ETH_PORT_LINK, (void *)&link_event, sizeof(ca_event_port_link_t));
+```
+
+这个口起来后硬件需要始终保持 link，所以可以在 sdk 初始化时直接通知驱动 carrier on 即可。
+
+
+
+#### 主控读取中断和 ready 信号
+
+子卡1  sys_ok 读，子卡1（slot3）给出 gpio 97 低有效 sys_ok 信号
+```
+btest spi firmware w 0 0xC5 1 0x00 
+btest spi firmware r 0 0xC4 1 
+```
+
+
+子卡2  sys_ok 读，子卡2（slot4）给出 gpio 97 低有效 sys_ok 信号
+```
+btest spi firmware w 0 0xC8 1 0x00 
+btest spi firmware r 0 0xC7 1 
+```
+
+
+```
+btest spi firmware w 0 0x28 1 0xff
+btest spi firmware r 0 0x2b 1 
+```
+
+中断信号，bit0 和 bit1 低有效，子卡1（slot3）给出 gpio 96 低有效的中断信号后，主控 bit0 读到期望为 0
+```
+btest spi firmware r 0 0x56 1 
+```
+
+子卡写 gpio 96 是触发中断信号给主控，写 gpio 97 是触发 sys_ok 信号给主控
+```
+btest gpio w 96 0
+btest gpio w 97 0
+```
+
+
+#### 子卡通过主控 cpld 判断所在槽位
+
+B7  GPIO3[6]，gpio num 102
+D3   GPIO3[2]，gpio num 98
+
+Slot1，左边槽位
+
+16'h009B ;      写1  表示输出
+16'h009C ;      写1 表示输出低电平    CPU_GPIO3[6]为低电平 ;   写2 表示输出高电平  CPU_GPIO3[6]为高电平
+
+16'h00D1 ;    写1  表示输出
+16'h00D2 ;    写1 表示输出低电平      CPU_GPIO3[2]为低电平 ;   写2 表示输出高电平  CPU_GPIO3[2]为高电平
+
+```
+btest spi firmware w  0 0x9b 1 0x1
+btest spi firmware w  0 0x9c 1 0x1
+
+btest spi firmware w  0 0xd1 1 0x1
+btest spi firmware w  0 0xd2 1 0x1
+```
+
+
+Slot2，右边槽位
+
+16'h009E ;     写1  表示输出
+16'h009F ;     写1 表示输出低电平    CPU_GPIO3[6]为低电平 ;   写2 表示输出高电平   CPU_GPIO3[6]为高电平
+
+16'h00D4 ;   写1  表示输出
+16'h00D5 ;   写1 表示输出低电平      CPU_GPIO3[2]为低电平 ;   写2 表示输出高电平  CPU_GPIO3[2]为高电平
+
+```
+btest spi firmware w  0 0x9e 1 0x1
+btest spi firmware w  0 0x9f 1 0x1
+
+btest spi firmware w  0 0xd4 1 0x1
+btest spi firmware w  0 0xd5 1 0x1
+```
+
+以上寄存器是通过写iTN331-E-4XG 主控的cpld 来输出高低电平,  5GW子卡通过这些状态来判断
+
+
+#### USB3.0 和 10GPON 口透传配置
+
+**USB加速**
+
+- 參考 linux-4.4.x/drivers/net/usb/usbnet.c
+
+	修改rx data path接入FC driver
+
+	Key word:
+	```
+	#ifdef CONFIG_HWNAT_FLEETCONNTRACK
+	    extern int rtk_fc_fastfwd_netif_rx(struct sk_buff *skb);
+	    status = rtk_fc_fastfwd_netif_rx(skb);
+	#else
+	    status = netif_rx (skb);
+	#endif
+	```
+
+- 參考: Realtek Fleet Conntrack Driver programming guide
+
+	其中的6. Wlan/USB Acceleration
+
+	Key word: 
+	```
+	echo del dev {devname} > /proc/fc/sw_dump/wlan_devmap
+	
+	# 5gw上网卡是 cell
+	echo del dev cell > /proc/fc/sw_dump/wlan_devmap
+	
+	# 清除配置
+	echo flush > /proc/fc/sw_dump/wlan_devmap
+	
+	```
+
+	需注意要重新down/up netdev
+
+- 以上若usb driver的skb data沒有其他私有header, 即可與FC快速建立加速關聯
+
+	cat /proc/fc/sw_dump/wlan_devmap 要可以看到netdev
+	基本封包要可以流通
+
+
+**資料透傳**
+
+- Plan A: 推薦最基本做法是HGU的流表加速, 上層軟轉可通, FC driver及學習
+	BC/MC, unknown UC等需要額外探討軟轉or 特殊加速控制
+
+- Plan B: ACL redirect rule進行全透傳，不修改封包，不需要其他細微Qos控制
+	WIFI to ETH:
+	```
+	Key:
+	RTK.0> rt_acl set pattern ingress_port_mask … 指定from 0x40000 (port 0x12, 參考 wlan_devmap 設定)
+	
+	Action:
+	RTK.0> rt_acl set action FORWARD redirect port 7 指定to ETH port number
+	```
+	
+	ETH to WIFI:
+	```
+	Key:
+	RTK.0> rt_acl set pattern ingress_port_mask 0x80 … 指定from 0x80 (port7, XFI port)
+	
+	Action:
+	RTK.0> rt_acl set action FORWARD redirect port 0x12 … 指定cpu port e.g. 0x12
+	RTK.0> rt_acl set action FORWARD redirect flowid … 指定cpu port上的 dev mapping idx e.g. 11 (參考 wlan_devmap 設定)
+	
+	
+	rt_cls clear ext-rule
+	rt_cls set ext-rule filter igrPort data 7 mask 0x3f
+	rt_cls set ext-rule action fwd ldpid 0x18
+	rt_cls add ext-rule index 0
+	
+	```
+
+
+**Note: assign flowid** **需patch FC driver**才可支援
+```
+[FC][77 Series] RT ACL support redirect with flowid
+
+ - Special usage case for SFU
+   - force redirect to wifi fast forward with wlan device index
+   - force redirect to pon with pon stream id
+ - Usage
+   [DIAG]
+    rt_acl set action FORWARD redirect flowid N
+   [API]
+    action_fields |= RT_ACL_ACTION_FORWARD_GROUP_REDIRECT_FLOWID_BIT
+	action_forward_group_redirect_flowid
+```
+
+**若不熟悉RT ACL API**，可先參考API **文件**
+
+
+
+```
+# 这一条可以修改代码实现，不用 echo 配置
+echo del dev cell > /proc/fc/sw_dump/wlan_devmap
+
+diag
+rt_acl set pattern ingress_port_mask 0x40000
+rt_acl set action FORWARD redirect port 7
+rt_acl add entry
+
+
+rt_acl set pattern ingress_port_mask 0x80
+rt_acl set action FORWARD redirect port 0x12
+rt_acl set action FORWARD redirect flowid 54
+rt_acl add entry
+
+rt_cls clear ext-rule
+rt_cls set ext-rule filter igrPort data 7 mask 0x3f
+rt_cls set ext-rule action fwd ldpid 0x18
+rt_cls add ext-rule index 100
+
+# 查看配置的 acl 表项
+cat /proc/fc/sw_dump/acl
+
+```
+
+
+```
+echo 1 > /proc/fc/sw_dump/fwd_statistic
+echo 1 > /proc/fc/sw_dump/smp_statistic
+
+#打流
+cat /proc/fc/sw_dump/fwd_statistic
+cat /proc/fc/sw_dump/smp_statistic
+```
+
+抓測試包相關 debug 資訊，包含 header I & nic rx log
+```
+cat /proc/fc/hw_dump/headeri
+echo 0x8 > /proc/ni/ni_debug ; sleep 3; echo 0 > /proc/ni/ni_debug
+```
+
+```
+cat /proc/fc/ctrl/wan_port_mask
+cat /proc/fc/hw_dump/acl
+```
+
+
+####  gre 配置验证
+
+##### 基本业务配置
+
+```
+
+                     -----                                    -----
+                    |     |                                  |     |
+           gi 1/2/1 |     | ten 1/3/1             ten 1/3/1  |     | gi 1/2/1
+        ----------->| 184 | -------------------------------> | 185 | ----------->
+                    |     |                                  |     |
+                    |     |                                  |     |
+                     -----                                    -----
+
+```
+
+
+184 设备配置
+```
+mpls lsr-id 11.11.11.11
+mpls enable
+
+interface loopback 2
+ip address 11.11.11.11 255.255.255.255
+exit
+
+interface tunnel 1/1/1
+tunnel mode gre
+source 10.128.1.184
+destination 10.128.1.185
+gre key plain 2000
+exit
+
+interface tengigabitethernet 1/3/1
+ip address 10.128.1.184 255.255.255.0
+exit
+
+ip route 22.22.22.22 255.255.255.255 10.128.1.185 tengigabitethernet 1/3/1
+
+interface gigaethernet 1/2/1
+mode l2
+mpls static-l2vc destination 22.22.22.22 raw vc-id 2 in-label 1000 out-label 2000 tunnel 1/1/1
+exit
+
+
+
+
+###################### delete config ######################
+
+interface gigaethernet 1/2/1
+no mpls static-l2vc
+exit
+
+no interface tunnel 1/1/1
+no interface loopback 2
+no ip route 22.22.22.22 255.255.255.255
+
+mpls disable
+no mpls lsr-id
+
+```
+
+
+185 设备配置
+```
+mpls lsr-id 22.22.22.22
+mpls enable
+
+interface loopback 2
+ip address 22.22.22.22 255.255.255.255
+exit
+
+interface tunnel 1/1/1
+tunnel mode gre
+source 10.128.1.185
+destination 10.128.1.184
+gre key plain 2000
+exit
+
+interface tengigabitethernet 1/3/1
+ip address 10.128.1.185 255.255.255.0
+exit
+
+ip route 11.11.11.11 255.255.255.255 10.128.1.184 tengigabitethernet 1/3/1
+
+interface gigaethernet 1/2/1
+mode l2
+mpls static-l2vc destination 11.11.11.11 raw vc-id 2 in-label 2000 out-label 1000 tunnel 1/1/1
+exit
+```
+
+
+##### 主备业务配置
+
+```
+
+                     -----                                    -----
+                    |     | ten 1/3/1           ten 1/3/1    |     |
+           gi 1/2/1 |     | -------------------------------> |     |  gi 1/2/1
+        ----------->| 184 |                                  | 185 | ----------->
+                    |     | -------------------------------> |     |
+                    |     | gi 1/2/3            gi 1/2/3     |     |
+                     -----                                    -----
+
+```
+
+184 设备配置
+```
+mpls lsr-id 11.11.11.11
+mpls enable
+
+
+interface loopback 2
+ip address 11.11.11.11 255.255.255.255
+exit
+
+interface tunnel 1/1/1
+tunnel mode gre
+source 10.128.1.184
+destination 10.128.1.185
+gre key plain 2000
+exit
+
+interface tunnel 1/1/2
+tunnel mode mpls
+destination 22.22.22.22
+mpls tunnel-id 1
+mpls te commit
+exit
+
+interface tengigabitethernet 1/3/1
+ip address 10.128.1.184 255.255.255.0
+exit
+
+interface gigaethernet 1/2/3
+ip address 10.10.1.184 255.255.255.0
+exit
+
+### ip route 22.22.22.22 255.255.255.255 10.128.1.185 tengigabitethernet 1/3/1
+### ip route 22.22.22.22 255.255.255.255 10.10.1.185 gigaethernet 1/2/3 distance 100
+
+interface gigaethernet 1/2/1
+mode l2
+mpls static-l2vc destination 22.22.22.22 raw vc-id 3 in-label 1001 out-label 2001 tunnel 1/1/2
+mpls static-l2vc destination 22.22.22.22 raw vc-id 2 in-label 1000 out-label 2000 tunnel 1/1/1 backup
+mpls l2vpn redundancy master switch-mode revertive wtr-time 60
+exit
+
+
+mpls bidirectional static-lsp ingress A-B lsr-id 22.22.22.22 tunnel-id 1
+forward 22.22.22.22 255.255.255.255 nexthop 10.10.1.185 out-label 10021
+backward in-label 10011
+exit
+
+
+
+###################### delete config ######################
+
+interface gigaethernet 1/2/1
+no mpls l2vpn redundancy master
+no mpls static-l2vc backup
+no mpls static-l2vc
+exit
+
+no interface tunnel 1/1/1
+no interface tunnel 1/1/2
+no interface loopback 2
+no ip route 22.22.22.22 255.255.255.255
+
+no mpls bidirectional ingress A-B
+
+
+mpls disable
+no mpls lsr-id
+
+```
+
+
+
+185 设备配置
+```
+mpls lsr-id 22.22.22.22
+mpls enable
+
+interface loopback 2
+ip address 22.22.22.22 255.255.255.255
+exit
+
+interface tunnel 1/1/1
+tunnel mode gre
+source 10.128.1.185
+destination 10.128.1.184
+gre key plain 2000
+exit
+
+interface tunnel 1/1/2
+tunnel mode mpls
+destination 11.11.11.11
+mpls tunnel-id 1
+mpls te commit
+exit
+
+interface tengigabitethernet 1/3/1
+ip address 10.128.1.185 255.255.255.0
+exit
+
+interface gigaethernet 1/2/3
+ip address 10.10.1.185 255.255.255.0
+exit
+
+### ip route 11.11.11.11 255.255.255.255 10.128.1.184 tengigabitethernet 1/3/1
+### ip route 11.11.11.11 255.255.255.255 10.10.1.184 gigaethernet 1/2/3 distance 100
+
+interface gigaethernet 1/2/1
+mode l2
+mpls static-l2vc destination 11.11.11.11 raw vc-id 3 in-label 2001 out-label 1001 tunnel 1/1/2
+mpls static-l2vc destination 11.11.11.11 raw vc-id 2 in-label 2000 out-label 1000 tunnel 1/1/1 backup
+mpls l2vpn redundancy master switch-mode revertive wtr-time 60
+exit
+
+mpls bidirectional static-lsp ingress A-B lsr-id 11.11.11.11 tunnel-id 1
+forward 11.11.11.11 255.255.255.255 nexthop 10.10.1.184 out-label 10011
+backward in-label 10021
+exit
+
+
+```
+
+
 
 
 
@@ -898,6 +1724,59 @@ gpio_test 104 1
 执行完后敲`r`启动 system，注意要断电进入 uboot 执行上面命令。
 
 > 这个后续需要写进 boot，启动时自动上电
+
+
+#### 模块复位
+
+复位管脚高电平有效：
+```
+btest gpio w 107 1
+btest gpio w 107 0
+```
+
+先写高电平，然后写低电平
+```
+# btest gpio w 107 1
+bsp_gpio_set_output_value unit(107) value(1)
+# 
+# usb 2-1: USB disconnect, device number 3
+cdc_ncm 2-1:1.0 cell: unregister 'cdc_ncm' usb-f0200000.usb3-xhci-1, CDC NCM
+option1 ttyUSB0: GSM modem (1-port) converter now disconnected from ttyUSB0
+option 2-1:1.2: device disconnected
+option1 ttyUSB1: GSM modem (1-port) converter now disconnected from ttyUSB1
+option 2-1:1.3: device disconnected
+option1 ttyUSB2: GSM modem (1-port) converter now disconnected from ttyUSB2
+option 2-1:1.4: device disconnected
+option1 ttyUSB3: GSM modem (1-port) converter now disconnected from ttyUSB3
+option 2-1:1.5: device disconnected
+
+# 
+# lsusb
+Bus 001 Device 001: ID 1d6b:0002
+Bus 002 Device 001: ID 1d6b:0003
+# 
+# 
+# btest gpio w 107 0
+bsp_gpio_set_output_value unit(107) value(0)
+
+usb 2-1: new SuperSpeed Gen 1 USB device number 4 using xhci-hcd
+cdc_ncm 2-1:1.0: MAC-Address: 62:5f:cd:d9:28:eb
+cdc_ncm 2-1:1.0 cell: register 'cdc_ncm' at usb-f0200000.usb3-xhci-1, CDC NCM, 62:5f:cd:d9:28:eb
+register 'cdc_ncm' at usb-f0200000.usb3-xhci-1, CDC NCM, 62:5f:cd:d9:28:eb
+option 2-1:1.2: GSM modem (1-port) converter detected
+usb 2-1: GSM modem (1-port) converter now attached to ttyUSB0
+option 2-1:1.3: GSM modem (1-port) converter detected
+usb 2-1: GSM modem (1-port) converter now attached to ttyUSB1
+option 2-1:1.4: GSM modem (1-port) converter detected
+usb 2-1: GSM modem (1-port) converter now attached to ttyUSB2
+option 2-1:1.5: GSM modem (1-port) converter detected
+usb 2-1: GSM modem (1-port) converter now attached to ttyUSB3
+
+# lsusb
+Bus 002 Device 004: ID 2cb7:0a05
+Bus 001 Device 001: ID 1d6b:0002
+Bus 002 Device 001: ID 1d6b:0003
+```
 
 
 #### 检查 USB 驱动挂载
@@ -1303,25 +2182,711 @@ AT(Attention) 命令是用于控制通信模块（5G模组，调制解调器）�
 
 3、常用指令详解
 （1）基础功能指令
+```
 通信测试： AT -> 返回OK表示串口连通。
 信号强度： AT+CSQ -> 返回 +CSQ:<rssi>,<ber> (数值越大越好)
 SIM卡状态： AT+CPIN? -> 返回 READY 表示识别成功。
+```
 
 （2）网络控制指令
 模式切换：
+```
 AT+CFUN=0 # 进入飞行模式
 AT+CFUN=1 # 恢复全功能模式：ml-citation{ref="9,13" data="citationList"}
 
 5G频段锁定： AT+QNWPREFCFG="nr5g_band",1:78
 APN设置： AT+CGDCONT=1,"IPV4V6","cmnet" （移动默认APN）
+```
 
 （3）高级功能指令
 IP过滤关闭：
+```
+
 AT^WHITELISTCTL=0
 AT^IPFILTERSWITCH=0 #允许非终端IP数据包转发：ml-citation{ref="6,10" data="citationList"}
 
 自动拨号： AT+GTAUTOCONNECT=1(广和通模组专用)
+```
 
+
+
+##### 常用命令
+
+###### 查询模块生产厂家信息
+```
+cat /dev/ttyUSB0 &
+echo -e "AT+CGMI?\r\n" > /dev/ttyUSB0
+
+#应答
+AT+CGMI?
+
++CGMI: "Fibocom Wireless Inc."
+
+OK
+
+# 
+# 
+```
+
+###### 查询当前模式
+```
+cat /dev/ttyUSB0 &
+echo -e "AT+GTUSBMODE?\r\n" > /dev/ttyUSB0
+
+#应答
+AT+GTUSBMODE?
+
++GTUSBMODE: 36
+
+OK
+```
+
+
+###### 查询IMEI，每个模块唯一
+```
+cat /dev/ttyUSB0 &
+echo -e "AT+CGSN?\r\n" > /dev/ttyUSB0
+
+#应答
+AT+CGSN?
+
++CGSN: "862138051858640"
+
+OK
+```
+
+
+###### 查询批次号
+```
+cat /dev/ttyUSB0 &
+echo -e "AT+CFSN?\r\n" > /dev/ttyUSB0
+
+# 应答
+AT+CFSN?
+
++CFSN: "BDUJQJ0028"
+
+OK
+```
+
+
+###### 查询 PIN 码
+```
+cat /dev/ttyUSB0 &
+echo -e "AT+CPIN?\r\n" > /dev/ttyUSB0
+
+# 应答
+AT+CPIN?
+
++CPIN: READY
+
+OK
+```
+
+拔出 SIM 卡串口会打印提示
+```
++SIM: Removed
++SIM DROP
+```
+
+插入时会提示
+```
++SIM: Inserted
++SIM READY
+```
+
+
+###### 查询当前 SIM 卡信息
+```
+cat /dev/ttyUSB0 &
+echo -e "AT+GTDUALSIM?\r\n" > /dev/ttyUSB0
+
+```
+
+###### 查询 APN 配置
+```
+cat /dev/ttyUSB0 &
+echo -e "AT+CGDCONT?\r\n" > /dev/ttyUSB0
+
+# 应答
+AT+CGDCONT?
+
++CGDCONT: 0,"IPV4V6","CMIOT","10.2.60.180,36.9.141.76.0.30.4.217.0.0.0.0.0.0.0.1",0,0,0,0
++CGDCONT: 1,"IPV4V6","CMIOT","10.2.60.180,36.9.141.76.0.30.4.217.0.0.0.0.0.0.0.1",0,0,0,0
++CGDCONT: 2,"IPV4V6","","0.0.0.0,0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0",0,0,0,0
++CGDCONT: 3,"IPV4V6","","0.0.0.0,0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0",0,0,0,0
++CGDCONT: 4,"IPV4V6","","0.0.0.0,0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0",0,0,0,0
++CGDCONT: 5,"IPV4V6","","0.0.0.0,0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0",0,0,0,0
++CGDCONT: 6,"IPV4V6","","0.0.0.0,0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0",0,0,0,0
++CGDCONT: 7,"IPV4V6","","0.0.0.0,0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0",0,0,0,0
++CGDCONT: 8,"IPV4V6","","0.0.0.0,0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0",0,0,0,0
++CGDCONT: 9,"IPV4V6","","0.0.0.0,0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0",0,0,0,0
++CGDCONT: 10,"IPV4V6","","0.0.0.0,0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0",0,0,0,0
++CGDCONT: 11,"IPV4V6","ims","0.0.0.0,0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0",0,0,0,0
+
+OK
+```
+
+###### 设置 APN
+
+移动卡默认 APN 名称是 CMIOT
+```
+cat /dev/ttyUSB0 &
+echo -e "AT+CGDCONT=1,\"IPV4V6\",\"CMIOT\"\r\n" > /dev/ttyUSB0
+
+# 或者
+echo -e "AT+CGDCONT=1,\"IP\",\"CMIOT\"\r\n" > /dev/ttyUSB0
+
+```
+
+###### 查看热插拔是否关闭
+
+若返回0，则热插拔关闭。可以试着开启热插拔（AT+MSMPD=1，需要重启生效），看能否正常识卡（AT+CPIN?是否返回ready）。
+```
+cat /dev/ttyUSB0 &
+echo -e "AT+MSMPD?\r\n" > /dev/ttyUSB0
+```
+
+###### 查询信号强度
+```
+cat /dev/ttyUSB0 &
+echo -e "AT+CSQ?\r\n" > /dev/ttyUSB0
+
+```
+
+
+###### 查询信号指标
+
+返回值：
+`+CESQ: <rxlev>,<ber>,<rscp>,<ecno>,<rsrq>,<rsrp>,<ss_rsrq>,<ss_rsrp>,<ss_sinr>`
+
+其中：
+`<rxlev>,<ber>`： 表示2G，参数大于0并且不是99。
+`<rscp>,<ecno>`：表示3G，参数大于0并且不是255。
+`<rsrq>,<rsrp>`：表示4G，参数大于0并且不是255。
+`<ss_rsrq>,<ss_rsrp>,<ss_sinr>`：表示5G，参数大于0并且不是255。
+
+假如连续查90秒返回值不正确，则复位模块。
+```
+
+cat /dev/ttyUSB0 &
+echo -e "AT+CESQ\r\n" > /dev/ttyUSB0
+
+# 应答
+AT+CESQ
+
++CESQ: 99,99,255,255,255,255,71,74,74
+
+OK
+```
+
+###### 设置驻网
+
+```
+cat /dev/ttyUSB0 &
+echo -e "AT+COPS?\r\n" > /dev/ttyUSB0
+
+# 应答
+AT+COPS?
+
++COPS: 0,0,"CHINA MOBILE",11
+
+OK
+```
+
+###### 网络注册状态
+```
+cat /dev/ttyUSB0 &
+echo -e "AT+CREG?\r\n" > /dev/ttyUSB0
+
+# 应答
+
+```
+
+```
+cat /dev/ttyUSB0 &
+echo -e "AT+CGREG?\r\n" > /dev/ttyUSB0
+```
+
+
+###### 自动/手动拨号配置
+
+查询
+```
+cat /dev/ttyUSB0 &
+echo -e "AT+GTRNDIS?\r\n" > /dev/ttyUSB0
+
+# 应答
++SIM READY
+
+AT+GTRNDIS?
+
++GTRNDIS: 1,1,"10.2.60.180,2409:8d4c:001e:04d9:0000:0000:0000:0001","111.48.8.188,2409:804c:0000:2000:0000:0000:0000:0001","111.48.10.188,2409:804c:0000:200a:0000:0000:0000:0001"
+
+OK
+```
+
+配置激活手动拨号
+```
+cat /dev/ttyUSB0 &
+echo -e "AT+GTRNDIS=1,1\r\n" > /dev/ttyUSB0
+```
+
+释放上次拨号
+```
+echo -e "AT+GTRNDIS=0,1\r\n" > /dev/ttyUSB0
+```
+
+通过GTRNDIS命令拨号，它同样可以支持自动拨号，模组上电入网自动拨号给上位机分配IP地址
+```
+cat /dev/ttyUSB0 &
+echo -e "AT+GTAUTOCONNECT=0\r\n" > /dev/ttyUSB0
+
+# 读取当前配置
+echo -e "AT+GTAUTOCONNECT?\r\n" > /dev/ttyUSB0
+```
+
+
+######  GTPING 检查数据业务连接状态
+```
+echo -e "AT+GTPING=0,\"8.8.8.8\"\r\n" > /dev/ttyUSB0
+
+# ping 对端模组获取的IP
+echo -e "AT+GTPING=0,\"10.13.234.76\"\r\n" > /dev/ttyUSB0
+
+# ping 对端模组获取的IP
+echo -e "AT+GTPING=0,\"10.6.55.59\"\r\n" > /dev/ttyUSB0
+
+# ping 百度的地址
+echo -e "AT+GTPING=0,\"220.181.111.232\"\r\n" > /dev/ttyUSB0
+
+
+# 应答
+AT+GTPING=0,"8.8.8.8"
+
++GTPING: 1
+
+OK
+```
+
+###### 设置模块功能
+
+```
+cat /dev/ttyUSB0 &
+echo -e "AT+CFUN?\r\n" > /dev/ttyUSB0
+
+# 应答
+AT+CFUN?
+
++CFUN: 1,0
+
+OK
+```
+
+
+###### 设置模块低电平识别 SIM 卡
+
+模块默认是高电平识别，设置低电平后重启模块，该命令可以掉电保存
+```
+cat /dev/ttyUSB0 &
+echo -e "AT+GTSET="SIMPHASE",0,0\r\n" > /dev/ttyUSB0
+```
+
+
+###### 查询配置项
+```
+cat /dev/ttyUSB0 &
+echo -e "AT+GTSET?\r\n" > /dev/ttyUSB0
+```
+
+
+###### 设置日志
+```
+echo -e "AT+GTSET=\"LOGLEVEL\",7\r\n" > /dev/ttyUSB0
+
+echo -e "AT+GTLOGEN=1\r\n" > /dev/ttyUSB0
+
+# 查询当前使能状态
+echo -e "AT+GTLOGEN?\r\n" > /dev/ttyUSB0
+```
+
+然后把logtool 拷贝到 /tmp 路径（因为其他路径不允许创建文件），执行二进制文件后台运行
+```
+./logtool &
+```
+
+> 注意：logtool 二进制文件在哪个路径下时，执行后会在相同路径下创建一个 log_files 目录，用来存放生成的 .logel 日志文件。
+
+
+###### 开启后路由功能
+```
+echo -e "AT+GTSET=\"POSTROUTE\",1\r\n" > /dev/ttyUSB0
+
+```
+
+
+###### 配置 IP 透传模式
+
+配置 GTIPPASS=1，将模块从 NAT 模式切换为 IP 透传模式，此时运营商分配的公网 IP（如10.192.141.192）会直接分配给主机网卡（如 cell 接口），而非模块私网 IP（如192.168.225.\*）。
+两者的区别：
+- NAT 模式（IPPASS=0）：模块作为网关，主机通过私网 IP 访问外网（如 192.168.225.2 -> 模块转发流量）。
+- 透传模式（IPPASS=1）：主机直接使用公网 IP（如10.192.141.192），模块仅作为通道，主机需要自行处理路由与防火墙规则。
+
+```
+cat /dev/ttyUSB0 &
+
+# 查询当前配置
+echo -e "AT+GTIPPASS?\r\n" > /dev/ttyUSB0
+
+# 查询配置参数选项
+echo -e "AT+GTIPPASS=?\r\n" > /dev/ttyUSB0
+
+# 配置透传模式
+echo -e "AT+GTIPPASS=1\r\n" > /dev/ttyUSB0
+```
+
+
+###### ECM 拨号配置自动 DHCP
+```
+cat /dev/ttyUSB0 &
+echo -e "AT+GTAUTODHCP=1\r\n" > /dev/ttyUSB0
+
+echo -e "AT+GTAUTODHCP?\r\n" > /dev/ttyUSB0
+
+```
+
+
+###### 配置模组锁定 5G 模式
+```
+echo -e "AT+GTACT=14\r\n" > /dev/ttyUSB0
+```
+
+
+###### 配置模组代理 arp 使能后本地IP掩码长度
+
+默认的长度应该是8，可能会出现 wan 口 IP 和模组的这个本地代理 IP 不在同一网段，无法正常学习 arp，比如 wan 口 IP：10.128.1.185，收到的 arp 请求的源 IP 是默认的模组代理 IP：10.0.0.1，配置长度为 24 后，wan 口收到的 arp 请求的源 IP 就变成了 10.128.1.1，可以正常走 arp 学习流程。
+```
+# 配置掩码长度 24
+echo -e "AT+GTSETMASK=3\r\n" > /dev/ttyUSB0
+```
+
+
+
+##### 拨号流程
+
+查询当前模式，Fx650 模块默认是 NCM 拨号，需要设置 USB 模式为 36 或者 37
+```
+ip link set cell up
+cat /dev/ttyUSB0 &
+echo -e "AT+GTUSBMODE?\r\n" > /dev/ttyUSB0
+
+```
+
+确保 SIM 卡识别正常
+```
+echo -e "AT+CPIN?\r\n" > /dev/ttyUSB0
+```
+
+模块注册上运营商网络
+```
+echo -e "AT+COPS?\r\n" > /dev/ttyUSB0
+```
+
+模块注册上 CS 域
+```
+echo -e "AT+CREG?\r\n" > /dev/ttyUSB0
+```
+
+模块注册上 PS 域
+```
+echo -e "AT+CGREG?\r\n" > /dev/ttyUSB0
+
+echo -e "AT+CEREG?\r\n" > /dev/ttyUSB0
+```
+
+设置 APN 接入点信息（）
+```
+echo -e "AT+CGDCONT=1,\"IPV4V6\",\"CMIOT\"\r\n" > /dev/ttyUSB0
+
+echo -e "AT+CGDCONT=1,\"IPV4V6\",\"5gto5gproject-a.5gzx.hb\"\r\n" > /dev/ttyUSB0
+```
+
+查询 APN 设置是否成功
+```
+echo -e "AT+CGDCONT?\r\n" > /dev/ttyUSB0
+```
+
+释放上次拨号
+```
+echo -e "AT+GTRNDIS=0,1\r\n" > /dev/ttyUSB0
+```
+
+配置激活 RNDIS 拨号
+```
+cat /dev/ttyUSB0 &
+echo -e "AT+GTRNDIS=1,1\r\n" > /dev/ttyUSB0
+```
+
+查询模块状态，`AT+GTRNDIS=1,1`返回 OK 后，下发 `AT+GTRNDIS?`，查询拨号是否成功，如果成功则会返回获取到的 IP 地址
+```
+echo -e "AT+GTRNDIS?\r\n" > /dev/ttyUSB0
+```
+
+
+```
+ip link set cell up
+cat /dev/ttyUSB0 &
+echo -e "AT+GTUSBMODE?\r\n" > /dev/ttyUSB0
+
+echo -e "AT+GTSET?\r\n" > /dev/ttyUSB0
+echo -e "AT+GTIPPASS?\r\n" > /dev/ttyUSB0
+echo -e "AT+GTACT?\r\n" > /dev/ttyUSB0
+
+echo -e "AT+GTIPPASS=1\r\n" > /dev/ttyUSB0
+echo -e "AT+GTSET=\"POSTROUTE\",1\r\n" > /dev/ttyUSB0
+echo -e "AT+GTACT=14\r\n" > /dev/ttyUSB0
+echo -e "AT+GTSETMASK=3\r\n" > /dev/ttyUSB0
+
+echo 1 > /proc/sys/net/ipv4/conf/cell/proxy_arp
+
+echo -e "AT+GTRNDIS=1,1\r\n" > /dev/ttyUSB0
+
+
+
+```
+
+##### 网卡IP 和路由配置
+
+应用层软件需要配置的内容，dhcp 从模组申请 IP，cell 网卡配置 IP，网关和 DNS 配置。
+
+**单台设备配置**
+```
+ip link set cell up
+
+# 设置udhcp唯一id
+echo "client_id=00:0E:5E:11:00:02" > /etc/udhcpc.conf
+
+udhcpc -i cell
+
+# 这个IP目前两台设备申请的都一样
+ip link set cell down
+ip addr add 192.168.225.2/24 dev cell
+ip link set cell up
+
+ip route add default via 192.168.225.1 dev cell
+
+echo "nameserver 8.8.8.8" > /etc/resolv.conf
+echo "nameserver 114.114.114.114" >> /etc/resolv.conf
+
+
+ping 8.8.8.8
+
+# ping baidu.com
+ping 220.181.111.232 -I cell
+
+# ping sina.com
+ping 49.7.37.60 -I cell
+```
+
+
+**设备A**（公网IP：10.13.30.10）
+```
+# ip link set cell up
+# udhcpc -i cell -r 192.168.225.100
+
+ip link set cell down
+ip addr add 192.168.225.100/24 dev cell
+ip link set cell up
+
+# 配置默认网关
+ip route add default via 192.168.225.1 dev cell
+
+# 配置更精确的静态路由，目的 IP 为这个指定地址的报文都通过大网发给对端的公网 IP
+ip route add 192.168.225.200/32 via 10.6.226.220 dev cell
+
+# ping 操作发起端配置 SNAT
+iptables -t nat -A POSTROUTING -s 192.168.225.100 -d 192.168.225.200 -j SNAT --to-source 10.13.30.10
+
+
+
+echo "nameserver 8.8.8.8" > /etc/resolv.conf
+echo "nameserver 114.114.114.114" >> /etc/resolv.conf
+
+```
+
+**设备B**（公网IP：10.6.226.220）
+```
+# ip link set cell up
+# udhcpc -i cell -r 192.168.225.200
+
+ip link set cell down
+ip addr add 192.168.225.200/24 dev cell
+ip link set cell up
+
+# 配置默认网关
+ip route add default via 192.168.225.1 dev cell
+
+iptables -A FORWARD -s 10.13.30.10 -d 192.168.225.200 -j ACCEPT
+
+iptables -t nat -A POSTROUTING -o cell -j MASQUERADE
+
+
+
+echo "nameserver 8.8.8.8" > /etc/resolv.conf
+echo "nameserver 114.114.114.114" >> /etc/resolv.conf
+```
+
+上面 NAT 模式需要申请本地 IP，透传模式使用模组从基站分配的公网 IP
+```
+10.13.131.214
+10.6.12.247
+
+
+udhcpc -i cell
+
+ifconfig cell 10.13.131.214 netmask 255.255.255.0
+ip route add default via 10.13.131.1 dev cell
+
+# 或者
+ifconfig cell 10.6.12.247 netmask 255.255.255.0
+ip route add default via 10.6.12.1 dev cell
+
+echo "nameserver 8.8.8.8" > /etc/resolv.conf
+echo "nameserver 114.114.114.114" >> /etc/resolv.conf
+```
+
+###### DHCP 获取 IP 地址
+
+```
+# udhcpc -i cell
+udhcpc (v1.22.1) started
+Sending discover...
+Sending select for 192.168.225.2...
+Lease of 192.168.225.2 obtained, lease time 86400
+```
+
+如果 cell 没有自动配置上 ip，手动配置
+```
+ifconfig cell 192.168.225.2 netmask 255.255.255.0
+```
+
+###### 网关设置
+
+正常情况你应该看到类似这样的输出：​​
+```
+default via 192.168.225.1 dev cell
+192.168.225.0/24 dev cell proto kernel scope link src 192.168.225.2
+```
+
+`default via 192.168.225.1`这一行至关重要！它表示发往所有非本地网络（即外网）的数据包，都会通过网关 `192.168.225.1`发送。如果没有这一条，你的设备就不知道把外网数据包发给谁。
+
+​如果缺少默认路由：​​你可能需要手动添加：
+
+```
+ip route add default via 192.168.1.1 dev cell
+```
+
+再查看路由配置信息
+```
+# ip route show
+default via 192.168.225.1 dev cell 
+10.0.0.0/24 dev ibc0 proto kernel scope link src 10.0.0.3 
+127.0.0.0/24 dev lo scope link 
+192.168.1.0/24 dev br0 proto kernel scope link src 192.168.1.254 
+192.168.225.0/24 dev cell proto kernel scope link src 192.168.225.2
+```
+
+```
+# route -n
+Kernel IP routing table
+Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+0.0.0.0         192.168.225.1   0.0.0.0         UG    0      0        0 cell
+10.0.0.0        0.0.0.0         255.255.255.0   U     0      0        0 ibc0
+127.0.0.0       0.0.0.0         255.255.255.0   U     0      0        0 lo
+192.168.1.0     0.0.0.0         255.255.255.0   U     0      0        0 br0
+192.168.225.0   0.0.0.0         255.255.255.0   U     0      0        0 cell
+```
+
+
+###### 检查并配置 DNS（最常见的问题根源！）
+
+`udhcpc`会从 DHCP 服务器获取 DNS 服务器地址，但它​不会自动更新系统的 DNS 配置文件​（如 `/etc/resolv.conf`）。你需要确保这个文件里有可用的 DNS 服务器。
+
+如果文件是空的，或者里面的 DNS 服务器不可用（如 `127.0.0.1`但本地没运行 DNS 服务），就会导致能 Ping 通 IP 但打不开网站（域名无法解析）。
+
+如果没有这个配置文件，手动创建并编辑：
+```
+echo "nameserver 8.8.8.8" > /etc/resolv.conf
+echo "nameserver 114.114.114.114" >> /etc/resolv.conf
+```
+
+- `8.8.8.8`是 Google 的公共 DNS。
+- `114.114.114.114`是国内移动/电信的公共 DNS。
+- `>`表示覆盖原文件，`>>`表示追加到文件末尾。
+
+
+ **一劳永逸的解决方案**：使用 `udhcpc`的脚本​`udhcpc`在获取到 IP 后，会调用一个脚本去设置网络参数。这个脚本通常叫 `/usr/share/udhcpc/default.script`。它的核心工作就是配置 IP、路由和 DNS​。
+
+检查这个脚本是否存在且有执行权限。
+确保脚本中有类似这样配置 DNS 的行：
+```
+[ -n "$dns" ] && echo "nameserver $dns" > /etc/resolv.conf
+```
+
+如果你的系统没有这个脚本，或者脚本有问题，你就需要手动完成上述配置。
+
+
+###### 测试网关连通性
+
+```
+ping 192.168.225.1
+```
+
+**如果不通**​​：问题在局域网层面，检查网线、物理连接、模组和路由器的配置。
+
+
+###### 测试外网 IP（测试网关的 NAT 和出口）
+
+```
+ping 8.8.8.8
+
+#或者ping baidu.com
+ping 220.181.111.232 -I cell
+```
+
+**如果通​**​：恭喜，你的 IP 和路由配置是正确的！问题 100% 出在 ​**​DNS​**​。请重点检查 DNS 配置。
+
+**如果不通​**​：但网关设置步骤中的网关是通的，那问题可能出在：
+
+- 防火墙​：路由器或你的设备本身的防火墙丢弃了数据包。
+- ​运营商的限制​：特别是对于 ​**​4G/5G** **蜂窝模组​**​，你可能获取的是一个运营商内网的 IP（如 `10.x.x.x`），运营商没有为你做 NAT 或者有额外的激活步骤。
+
+
+
+###### 针对蜂窝模组（4G/5G Cat.1/NB-IoT 等）的特殊情况
+
+对于通过蜂窝网络上网的模组，情况可能更复杂一些：
+
+1. ​**​APN** **配置是否正确？​**​ 在拨号前（例如使用 `pppd`或 `quectel-CM`等工具时），必须设置正确的 APN（接入点名称）。错误的 APN 可能导致你能获取 IP（运营商内网 IP），但无法访问外网。
+
+2. ​**​PDP** **上下文是否完全激活？​**​ 有些模组在获取 IP 后，还需要一个额外的“激活”步骤才能真正建立数据通道。
+
+3. **​获取的 IP 类型​**​：你获取到的可能是私有 IP（如 `10.x.x.x`），此时需要运营商网关为你做 NAT。如果运营商侧策略限制，即使有 IP 也无法上网。可以尝试在模组上执行 ​**​PDP 去激活再重新激活​**​。
+
+总结与行动清单
+
+| **步骤**    | **检查/操作**           | **命令/方法**                                                  | **预期结果**                       |
+| --------- | ------------------- | ---------------------------------------------------------- | ------------------------------ |
+| ​**​1​**​ | ​**​确认 IP 和默认路由​**​ | `ip route`或 `route -n`                                     | 看到 `default via [``网关IP]`      |
+| ​**​2​**​ | ​**​检查并配置 DNS​**​   | `cat /etc/resolv.conf`                                     | 文件中有有效的 `nameserver [DNS IP]`  |
+| ​**​3​**​ | ​**​分层 Ping 测试​**​  | 1. `ping [``网关IP]`2. `ping 8.8.8.8`3. `ping www.baidu.com` | 1. 通2. 通 -> DNS 问题3. 通 -> 全部正常 |
+
+​**​大概率问题出现在 DNS 配置。​**​请首先确保 `/etc/resolv.conf`被正确写入。如果上述步骤都无法解决，请提供以下信息以便更深入的分析：
+
+- 你使用的模组型号（如 EC20, BC26, M6315 等）。
+- 你获取到的 IP 地址、网关是什么（`ip addr show [``网卡名]`和 `ip route`的输出）。
+- `cat /etc/resolv.conf`的输出。
+- `ping 8.8.8.8`的结果。
 
 
 

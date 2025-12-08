@@ -16,6 +16,26 @@ git clean -fd
 git clean -n
 ```
 
+安全删除：
+```
+# 删除所有未跟踪文件，保留.gitignore 忽略的文件
+git clean -f
+
+#删除包括未跟踪目录在内的所有内容，文件+目录
+git clean -fd
+```
+
+
+强制删除，包括 .gitignore 文件：
+```
+# 删除所有未跟踪文件，包括 .gitignore 忽略的文件
+git clean -fx
+
+# 删除文件+目录，包括 .gitignore 忽略的内容
+git clean -fdx
+```
+
+
 示例脚本：
 ```
 #!/bin/bash
